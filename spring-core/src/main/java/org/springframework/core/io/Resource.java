@@ -48,7 +48,13 @@ import org.springframework.lang.Nullable;
  * @see ClassPathResource
  * @see ByteArrayResource
  * @see InputStreamResource
+ * spring的资源加载策略
+ * 	1. 职能划分清楚 资源的定义和加载有一个清晰的界限
+ * 	2. 统一的抽象 资源加载后要返回统一的抽象给客户端 客户端对资源进行怎样的处理 应该由抽象资源接口来定义
+ * 所有资源抽象和访问接口
  */
+//所有资源抽象和访问的接口
+//Resource作为资源的统一抽象 定义了通用的方法  有AbstractResource提供统一的默认实现
 public interface Resource extends InputStreamSource {
 
 	/**
@@ -57,6 +63,7 @@ public interface Resource extends InputStreamSource {
 	 * existence of a {@code Resource} handle only guarantees a valid
 	 * descriptor handle.
 	 */
+	//资源是否存在
 	boolean exists();
 
 	/**
@@ -68,6 +75,7 @@ public interface Resource extends InputStreamSource {
 	 * that the resource content cannot be read.
 	 * @see #getInputStream()
 	 */
+	//资源是否可读
 	default boolean isReadable() {
 		return true;
 	}
@@ -78,6 +86,7 @@ public interface Resource extends InputStreamSource {
 	 * and must be read and closed to avoid resource leaks.
 	 * <p>Will be {@code false} for typical resource descriptors.
 	 */
+	//资源所代表的句柄 是否被一个stream打开了
 	default boolean isOpen() {
 		return false;
 	}
@@ -90,6 +99,7 @@ public interface Resource extends InputStreamSource {
 	 * @since 5.0
 	 * @see #getFile()
 	 */
+	//是否是一个file
 	default boolean isFile() {
 		return false;
 	}
@@ -99,6 +109,7 @@ public interface Resource extends InputStreamSource {
 	 * @throws IOException if the resource cannot be resolved as URL,
 	 * i.e. if the resource is not available as descriptor
 	 */
+	//返回资源的url句柄
 	URL getURL() throws IOException;
 
 	/**
@@ -107,6 +118,7 @@ public interface Resource extends InputStreamSource {
 	 * i.e. if the resource is not available as descriptor
 	 * @since 2.5
 	 */
+	//返回uri句柄
 	URI getURI() throws IOException;
 
 	/**
@@ -116,6 +128,7 @@ public interface Resource extends InputStreamSource {
 	 * @throws IOException in case of general resolution/reading failures
 	 * @see #getInputStream()
 	 */
+	//返回file句柄
 	File getFile() throws IOException;
 
 	/**
@@ -129,6 +142,7 @@ public interface Resource extends InputStreamSource {
 	 * @since 5.0
 	 * @see #getInputStream()
 	 */
+	//返回ReadableByteChannel
 	default ReadableByteChannel readableChannel() throws IOException {
 		return Channels.newChannel(getInputStream());
 	}
@@ -153,6 +167,7 @@ public interface Resource extends InputStreamSource {
 	 * @return the resource handle for the relative resource
 	 * @throws IOException if the relative resource cannot be determined
 	 */
+	//根据资源的相对路径创建资源
 	Resource createRelative(String relativePath) throws IOException;
 
 	/**

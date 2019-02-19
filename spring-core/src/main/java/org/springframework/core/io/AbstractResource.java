@@ -41,6 +41,8 @@ import org.springframework.util.ResourceUtils;
  * @author Juergen Hoeller
  * @since 28.12.2003
  */
+//Resource接口的默认抽象实现 实现了Resource接口的大部分的公共实现
+	//如果想要自己定义resource 基础AbstractResource
 public abstract class AbstractResource implements Resource {
 
 	/**
@@ -52,6 +54,7 @@ public abstract class AbstractResource implements Resource {
 	public boolean exists() {
 		// Try file existence: can we find the file in the file system?
 		try {
+			//基于file进行判断
 			return getFile().exists();
 		}
 		catch (IOException ex) {
@@ -118,6 +121,7 @@ public abstract class AbstractResource implements Resource {
 	 * This implementation throws a FileNotFoundException, assuming
 	 * that the resource cannot be resolved to an absolute file path.
 	 */
+	//抛出FileNotFoundException 异常  交给子类实现
 	@Override
 	public File getFile() throws IOException {
 		throw new FileNotFoundException(getDescription() + " cannot be resolved to absolute file path");
@@ -141,6 +145,7 @@ public abstract class AbstractResource implements Resource {
 	 * @see #getInputStream()
 	 */
 	@Override
+	//获取资源的实际长度  通过遍历来获取
 	public long contentLength() throws IOException {
 		InputStream is = getInputStream();
 		try {
@@ -193,6 +198,7 @@ public abstract class AbstractResource implements Resource {
 	 * This implementation throws a FileNotFoundException, assuming
 	 * that relative resources cannot be created for this resource.
 	 */
+	//抛出异常  交给子类实现
 	@Override
 	public Resource createRelative(String relativePath) throws IOException {
 		throw new FileNotFoundException("Cannot create a relative resource for " + getDescription());
@@ -204,6 +210,7 @@ public abstract class AbstractResource implements Resource {
 	 */
 	@Override
 	@Nullable
+	//返回null 交给子类实现
 	public String getFilename() {
 		return null;
 	}
