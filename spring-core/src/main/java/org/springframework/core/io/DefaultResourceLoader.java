@@ -45,6 +45,7 @@ import org.springframework.util.StringUtils;
  * @see FileSystemResourceLoader
  * @see org.springframework.context.support.ClassPathXmlApplicationContext
  */
+//资源加载默认实现  一般框架都会使用默认实现类
 public class DefaultResourceLoader implements ResourceLoader {
 
 	@Nullable
@@ -105,6 +106,7 @@ public class DefaultResourceLoader implements ResourceLoader {
 	 * @since 4.3
 	 * @see #getProtocolResolvers()
 	 */
+	//用户自定义protocolResolver 通过这个方法加入spring体系
 	public void addProtocolResolver(ProtocolResolver resolver) {
 		Assert.notNull(resolver, "ProtocolResolver must not be null");
 		this.protocolResolvers.add(resolver);
@@ -140,10 +142,12 @@ public class DefaultResourceLoader implements ResourceLoader {
 	}
 
 
+	//核心实现（因为两个子类并没有覆盖这个方法 所以断定ResourceLoader的资源加载方式 就定义在这个类中）
 	@Override
 	public Resource getResource(String location) {
 		Assert.notNull(location, "Location must not be null");
 
+		//首先通过protocolResolver加载资源  用户自定义资源优先使用用户规则进行加载
 		for (ProtocolResolver protocolResolver : this.protocolResolvers) {
 			Resource resource = protocolResolver.resolve(location, this);
 			if (resource != null) {
@@ -151,14 +155,18 @@ public class DefaultResourceLoader implements ResourceLoader {
 			}
 		}
 
+		//以"/"开头  返回ClassPathContextResource类型的资源
 		if (location.startsWith("/")) {
+			//加载的资源时ClassPathResource
 			return getResourceByPath(location);
 		}
+		//以 classpath: 开头  返回ClassPathResource类型的资源
 		else if (location.startsWith(CLASSPATH_URL_PREFIX)) {
 			return new ClassPathResource(location.substring(CLASSPATH_URL_PREFIX.length()), getClassLoader());
 		}
 		else {
 			try {
+				//根据文件类型是否为url  返回FileUrlResource  或  UrlResouce
 				// Try to parse the location as a URL...
 				URL url = new URL(location);
 				return (ResourceUtils.isFileURL(url) ? new FileUrlResource(url) : new UrlResource(url));

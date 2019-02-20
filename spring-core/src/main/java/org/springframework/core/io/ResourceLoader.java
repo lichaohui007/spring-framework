@@ -65,6 +65,12 @@ public interface ResourceLoader {
 	 * @see Resource#exists()
 	 * @see Resource#getInputStream()
 	 */
+	//根据location路径返回Resource的资源实例
+	//支持url模式  file:C:/test.dat 加载绝对路径的配置文件
+	//支持classpath   最主要用来加载.class文件  即编译后的class文件夹下的资源
+	//支持  相对路径  加载配置文件  properties等
+
+	//最主要在DefaultResourceLoader
 	Resource getResource(String location);
 
 	/**
@@ -77,6 +83,7 @@ public interface ResourceLoader {
 	 * @see org.springframework.util.ClassUtils#getDefaultClassLoader()
 	 * @see org.springframework.util.ClassUtils#forName(String, ClassLoader)
 	 */
+	//返回加载资源时使用的classloader  指定的classLoader加载指定的资源
 	@Nullable
 	ClassLoader getClassLoader();
 
