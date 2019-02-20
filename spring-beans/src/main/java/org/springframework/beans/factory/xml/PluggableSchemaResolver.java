@@ -61,6 +61,7 @@ public class PluggableSchemaResolver implements EntityResolver {
 	 * The location of the file that defines schema mappings.
 	 * Can be present in multiple JAR files.
 	 */
+	//schemas  网络xsd和本地xsd的映射文件
 	public static final String DEFAULT_SCHEMA_MAPPINGS_LOCATION = "META-INF/spring.schemas";
 
 
@@ -69,9 +70,11 @@ public class PluggableSchemaResolver implements EntityResolver {
 	@Nullable
 	private final ClassLoader classLoader;
 
+	// 存储shemas映射关系的文件
 	private final String schemaMappingsLocation;
 
 	/** Stores the mapping of schema URL -> local schema path */
+	//namespaceURI 与 schema 文件地址的映射集合
 	@Nullable
 	private volatile Map<String, String> schemaMappings;
 
@@ -103,6 +106,7 @@ public class PluggableSchemaResolver implements EntityResolver {
 		this.schemaMappingsLocation = schemaMappingsLocation;
 	}
 
+	//告诉java自带的xml解析器DocumentBuilder的解析规则
 	@Override
 	@Nullable
 	public InputSource resolveEntity(String publicId, @Nullable String systemId) throws IOException {
@@ -112,10 +116,13 @@ public class PluggableSchemaResolver implements EntityResolver {
 		}
 
 		if (systemId != null) {
+			//获取Resource所在的位置
 			String resourceLocation = getSchemaMappings().get(systemId);
 			if (resourceLocation != null) {
+				//通过类加载器加载文件  创建ClassPathResource
 				Resource resource = new ClassPathResource(resourceLocation, this.classLoader);
 				try {
+					//创建InputSource 对象  并设置publicId SystemId 等属性
 					InputSource source = new InputSource(resource.getInputStream());
 					source.setPublicId(publicId);
 					source.setSystemId(systemId);
@@ -137,6 +144,7 @@ public class PluggableSchemaResolver implements EntityResolver {
 	/**
 	 * Load the specified schema mappings lazily.
 	 */
+	//获取映射表  systemId 与本地文件的对照关系
 	private Map<String, String> getSchemaMappings() {
 		Map<String, String> schemaMappings = this.schemaMappings;
 		if (schemaMappings == null) {

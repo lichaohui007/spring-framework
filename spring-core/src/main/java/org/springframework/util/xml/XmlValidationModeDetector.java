@@ -98,10 +98,12 @@ public class XmlValidationModeDetector {
 				if (this.inComment || !StringUtils.hasText(content)) {
 					continue;
 				}
+				//包含DOCTYPE 返回true
 				if (hasDoctype(content)) {
 					isDtdValidated = true;
 					break;
 				}
+				//如果这一行有 <   并且 < 后面跟着字母 而不是 ！ 则返回true
 				if (hasOpeningTag(content)) {
 					// End of meaningful data...
 					break;
@@ -154,6 +156,7 @@ public class XmlValidationModeDetector {
 		}
 		String currLine = line;
 		while ((currLine = consume(currLine)) != null) {
+			//不是注释 且不是注释开通 返回该行的内容
 			if (!this.inComment && !currLine.trim().startsWith(START_COMMENT)) {
 				return currLine;
 			}
@@ -168,6 +171,7 @@ public class XmlValidationModeDetector {
 	@Nullable
 	private String consume(String line) {
 		int index = (this.inComment ? endComment(line) : startComment(line));
+		//从标记之后开始截取
 		return (index == -1 ? null : line.substring(index));
 	}
 
@@ -193,6 +197,7 @@ public class XmlValidationModeDetector {
 		if (index > - 1) {
 			this.inComment = inCommentIfPresent;
 		}
+		//返回这个标记之后的index
 		return (index == -1 ? index : index + token.length());
 	}
 

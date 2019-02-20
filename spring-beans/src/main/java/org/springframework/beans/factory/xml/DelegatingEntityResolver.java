@@ -58,6 +58,7 @@ public class DelegatingEntityResolver implements EntityResolver {
 	 * @param classLoader the ClassLoader to use for loading
 	 * (can be {@code null}) to use the default ClassLoader)
 	 */
+	//DelegatingEntityResolver 分别代理dtd 的 BeansDtdResolver 和 xml schemas 的 PluggableShemaResolver
 	public DelegatingEntityResolver(@Nullable ClassLoader classLoader) {
 		this.dtdResolver = new BeansDtdResolver();
 		this.schemaResolver = new PluggableSchemaResolver(classLoader);
@@ -69,6 +70,7 @@ public class DelegatingEntityResolver implements EntityResolver {
 	 * @param dtdResolver the EntityResolver to resolve DTDs with
 	 * @param schemaResolver the EntityResolver to resolve XML schemas with
 	 */
+	//自定义dtd 和 schema 的Resolver
 	public DelegatingEntityResolver(EntityResolver dtdResolver, EntityResolver schemaResolver) {
 		Assert.notNull(dtdResolver, "'dtdResolver' is required");
 		Assert.notNull(schemaResolver, "'schemaResolver' is required");
