@@ -105,11 +105,15 @@ public class BeanDefinitionReaderUtils {
 			throws BeanDefinitionStoreException {
 
 		String generatedBeanName = definition.getBeanClassName();
+		///没有className
 		if (generatedBeanName == null) {
+			//拿到父类ClassName创建实例
 			if (definition.getParentName() != null) {
+				//根据父className生成
 				generatedBeanName = definition.getParentName() + "$child";
 			}
 			else if (definition.getFactoryBeanName() != null) {
+				//根据工厂生成
 				generatedBeanName = definition.getFactoryBeanName() + "$created";
 			}
 		}

@@ -270,6 +270,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 				this.entityResolver = new ResourceEntityResolver(resourceLoader);
 			}
 			else {
+				//设置解析xml  dtd和schemas  的解析规则  xmlschemas 描述xml文件
 				this.entityResolver = new DelegatingEntityResolver(getBeanClassLoader());
 			}
 		}
@@ -401,6 +402,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 			throws BeanDefinitionStoreException {
 		try {
 			//获取xml document实例
+			// 将我们自定义的xml beans.xml 通过java的sax（simple api for xml）解析成Document对象
 			Document doc = doLoadDocument(inputSource, resource);
 			//根据document实例  注册Bean信息
 			return registerBeanDefinitions(doc, resource);
@@ -524,10 +526,16 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 * @see #setDocumentReaderClass
 	 * @see BeanDefinitionDocumentReader#registerBeanDefinitions
 	 */
+	//
 	public int registerBeanDefinitions(Document doc, Resource resource) throws BeanDefinitionStoreException {
+		//通过java的sax拿到Document对象  创建DocumentReader读取Document对象
 		BeanDefinitionDocumentReader documentReader = createBeanDefinitionDocumentReader();
+		//获取现有BeanDefinitionRegistry中BeanDefinition的数量
 		int countBefore = getRegistry().getBeanDefinitionCount();
+		//创建XmlReaderContext对象
+		//注册BeanDefinition
 		documentReader.registerBeanDefinitions(doc, createReaderContext(resource));
+		//计算新注册的BeanDefinition数量
 		return getRegistry().getBeanDefinitionCount() - countBefore;
 	}
 
@@ -543,6 +551,11 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 
 	/**
 	 * Create the {@link XmlReaderContext} to pass over to the document reader.
+	 * private ProblemReporter problemReporter = new FailFastProblemReporter();
+	 *
+	 * 	private ReaderEventListener eventListener = new EmptyReaderEventListener();
+	 *
+	 * 	private SourceExtractor sourceExtractor = new NullSourceExtractor();
 	 */
 	public XmlReaderContext createReaderContext(Resource resource) {
 		return new XmlReaderContext(resource, this.problemReporter, this.eventListener,

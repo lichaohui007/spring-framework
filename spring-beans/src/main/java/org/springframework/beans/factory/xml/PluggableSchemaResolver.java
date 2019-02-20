@@ -144,7 +144,7 @@ public class PluggableSchemaResolver implements EntityResolver {
 	/**
 	 * Load the specified schema mappings lazily.
 	 */
-	//获取映射表  systemId 与本地文件的对照关系
+	//获取映射表  systemId 与本地文件地址的对照关系
 	private Map<String, String> getSchemaMappings() {
 		Map<String, String> schemaMappings = this.schemaMappings;
 		if (schemaMappings == null) {
@@ -155,12 +155,14 @@ public class PluggableSchemaResolver implements EntityResolver {
 						logger.debug("Loading schema mappings from [" + this.schemaMappingsLocation + "]");
 					}
 					try {
+						//以Properties的形式加载META-INF下的文件
 						Properties mappings =
 								PropertiesLoaderUtils.loadAllProperties(this.schemaMappingsLocation, this.classLoader);
 						if (logger.isDebugEnabled()) {
 							logger.debug("Loaded schema mappings: " + mappings);
 						}
 						schemaMappings = new ConcurrentHashMap<>(mappings.size());
+						//将文件的内容合并入schemaMappings中
 						CollectionUtils.mergePropertiesIntoMap(mappings, schemaMappings);
 						this.schemaMappings = schemaMappings;
 					}

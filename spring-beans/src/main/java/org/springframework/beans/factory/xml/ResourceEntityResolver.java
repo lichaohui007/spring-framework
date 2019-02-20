@@ -72,15 +72,19 @@ public class ResourceEntityResolver extends DelegatingEntityResolver {
 
 	@Override
 	@Nullable
+	//如果 SAX 应用程序需要实现自定义处理外部实体，则必须实现此接口，并使用 #setEntityResolver(EntityResolver entityResolver) 方法，向 SAX 驱动器注册一个 EntityResolver 实例。
+	//如果实现xml的自定义解析 必须使用setEntityResolver接口
 	public InputSource resolveEntity(String publicId, @Nullable String systemId) throws SAXException, IOException {
 		InputSource source = super.resolveEntity(publicId, systemId);
 		if (source == null && systemId != null) {
 			String resourcePath = null;
 			try {
+				//从网络上下载资源
 				String decodedSystemId = URLDecoder.decode(systemId, "UTF-8");
 				String givenUrl = new URL(decodedSystemId).toString();
 				String systemRootUrl = new File("").toURI().toURL().toString();
 				// Try relative to resource base if currently in system root.
+
 				if (givenUrl.startsWith(systemRootUrl)) {
 					resourcePath = givenUrl.substring(systemRootUrl.length());
 				}
