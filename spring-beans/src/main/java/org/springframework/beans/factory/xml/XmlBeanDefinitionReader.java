@@ -551,6 +551,10 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 
 	/**
 	 * Create the {@link XmlReaderContext} to pass over to the document reader.
+	 *
+	 *
+	 *
+	 *
 	 * private ProblemReporter problemReporter = new FailFastProblemReporter();
 	 *
 	 * 	private ReaderEventListener eventListener = new EmptyReaderEventListener();

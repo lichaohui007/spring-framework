@@ -71,6 +71,7 @@ public class SimplePropertyNamespaceHandler implements NamespaceHandler {
 			Attr attr = (Attr) node;
 			String propertyName = parserContext.getDelegate().getLocalName(attr);
 			String propertyValue = attr.getValue();
+			//拿到definition中的属性进行操作
 			MutablePropertyValues pvs = definition.getBeanDefinition().getPropertyValues();
 			if (pvs.contains(propertyName)) {
 				parserContext.getReaderContext().error("Property '" + propertyName + "' is already defined using " +
