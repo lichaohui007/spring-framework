@@ -1551,12 +1551,25 @@ public class BeanDefinitionParserDelegate {
 		return parseCustomElement(ele, null);
 	}
 
+	/**
+	 * 首先会加载spring.handlers 文件  解析成为<namespaceUri,类全路径>映射
+	 * 根据类全路径会生成NameSpaceHandler对象
+	 * 调用NamespaceHandler的parse 方法 根据lacalName得到BeanDefinitionParser 对象
+	 *	调用改BeanDefinitonParser的parse方法  该方法定义在基类 AbstractBeanDefintionParser 抽象类中 有parseInternal放回一个AbstractBeanDefiniton
+	 * 就完成了标签到beanDefinition的映射
+	 *
+	 * parserInternal 由其子类AbstractSingleBeanDefinitionParser来实现
+	 
+	 *
+	 * */
 	@Nullable
 	public BeanDefinition parseCustomElement(Element ele, @Nullable BeanDefinition containingBd) {
+		//根据标签拿到namespace   每个namespace对应一个namespaceHandler 和 .xsd文件
 		String namespaceUri = getNamespaceURI(ele);
 		if (namespaceUri == null) {
 			return null;
 		}
+		//
 		NamespaceHandler handler = this.readerContext.getNamespaceHandlerResolver().resolve(namespaceUri);
 		if (handler == null) {
 			error("Unable to locate Spring NamespaceHandler for XML schema namespace [" + namespaceUri + "]", ele);

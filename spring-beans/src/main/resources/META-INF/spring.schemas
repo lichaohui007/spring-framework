@@ -28,3 +28,4 @@ http\://www.springframework.org/schema/util/spring-util-4.1.xsd=org/springframew
 http\://www.springframework.org/schema/util/spring-util-4.2.xsd=org/springframework/beans/factory/xml/spring-util.xsd
 http\://www.springframework.org/schema/util/spring-util-4.3.xsd=org/springframework/beans/factory/xml/spring-util.xsd
 http\://www.springframework.org/schema/util/spring-util.xsd=org/springframework/beans/factory/xml/spring-util.xsd
+http\://www.cmsblogs.com/schema/user.xsd=org/springframework/beans/factory/xml/user.xsd

@@ -55,6 +55,22 @@ import org.springframework.util.StringUtils;
  * @author Rob Harrop
  * @author Erik Wiersma
  * @since 18.12.2003
+ *
+ * 解析BeanDefinition的入口在DefaultBeanDefinitionDocumentReader的parseBeanDefinitions(Element root, BeanDefinitionParserDelegate delegate)
+ * 该方法会根据元素的命名空间（namespaceuri）判断标签是默认标签还是自定义标签 根据namespaceUri 拿到resolverHandler
+ *
+ * 默认标签:  由parseDefaultElement(Element ele,BeanDefinitionParserDelegate delegate)方法来实现
+ * 自定义标签： 由BeanDefinitionParserDelegate的parseCustomElement(Element ele,@Nullable BeanDefinition containingBd)方法来实现
+ *
+ * 在默认标签中会根据 import alias beans bean 四大标签进行处理
+ * 其中bean标签是核心标签 processBeanDefinition(Element ele,BeanDefinitionParserDelegate delegate)方法实现
+ *
+ * processBeanDefinition 方法分为三步
+ * 1.解析默认标签 BeanDefinitionParserDelegate.parserBeanDefinitionElement 方法 该方法解析<bean>标签的属性及各个子元素 解析完成返回一个GenericBeanDefinition实例对象
+ * 2.解析默认标签下的自定义标签 BeanDefinitionParserDelegate.decorateBeanDefintionIfRequired(Element ele, BeanDefinitionHolder holder)
+ * 3.注册BeanDefinition BeanDefinitionReaderUtils.registerBeanDefinition(BeanDefinitionHolder holder, BeanDefinitionRegistry registry)
+ *
+ *
  */
 public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocumentReader {
 
