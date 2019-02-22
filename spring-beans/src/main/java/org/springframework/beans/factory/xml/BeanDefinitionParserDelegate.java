@@ -1559,7 +1559,7 @@ public class BeanDefinitionParserDelegate {
 	 * 就完成了标签到beanDefinition的映射
 	 *
 	 * parserInternal 由其子类AbstractSingleBeanDefinitionParser来实现
-	 
+
 	 *
 	 * */
 	@Nullable

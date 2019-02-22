@@ -70,19 +70,37 @@ import org.springframework.util.StringUtils;
  */
 public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements SingletonBeanRegistry {
 
-	/** Cache of singleton objects: bean name --> bean instance */
+	/** Cache of singleton objects: bean name --> bean instance
+	 * 存放单例bean的映射
+	 *
+	 * */
+
 	private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(256);
 
-	/** Cache of singleton factories: bean name --> ObjectFactory */
+	/** Cache of singleton factories: bean name --> ObjectFactory
+	 * 存放的是ObjectFactory的映射 存放的是bean的factory
+	 * 对应关系 bean name --> ObjectFactory
+	 * */
 	private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>(16);
 
-	/** Cache of early singleton objects: bean name --> bean instance */
+	/** Cache of early singleton objects: bean name --> bean instance
+	 * 在earlySingleObjects 存放的bean不一定是完整的
+	 *
+	 * 在getSingleton的过程中 bean 就已经常见放入earlySingletonObjects 当出现循环依赖可以优先使用这个map里的bean
+	 * 存放原始的 bean 对象（尚未填充属性），用于解决循环依赖
+	 *
+	 *
+	 * */
 	private final Map<String, Object> earlySingletonObjects = new HashMap<>(16);
+
 
 	/** Set of registered singletons, containing the bean names in registration order */
 	private final Set<String> registeredSingletons = new LinkedHashSet<>(256);
 
-	/** Names of beans that are currently in creation */
+	/** Names of beans that are currently in creation
+	 *
+	 * 正在创建的单例名字的集合
+	 * */
 	private final Set<String> singletonsCurrentlyInCreation =
 			Collections.newSetFromMap(new ConcurrentHashMap<>(16));
 
@@ -103,10 +121,14 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	/** Map between containing bean names: bean name --> Set of bean names that the bean contains */
 	private final Map<String, Set<String>> containedBeanMap = new ConcurrentHashMap<>(16);
 
-	/** Map between dependent bean names: bean name --> Set of dependent bean names */
+	/** Map between dependent bean names: bean name --> Set of dependent bean names
+	 * 	维护beanName和它的依赖name之间的关系
+	 * */
 	private final Map<String, Set<String>> dependentBeanMap = new ConcurrentHashMap<>(64);
 
-	/** Map between depending bean names: bean name --> Set of bean names for the bean's dependencies */
+	/** Map between depending bean names: bean name --> Set of bean names for the bean's dependencies
+	 * 	依赖beanName -> beanName 集合
+	 * */
 	private final Map<String, Set<String>> dependenciesForBeanMap = new ConcurrentHashMap<>(64);
 
 
@@ -174,15 +196,25 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 */
 	@Nullable
 	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
+		//从单例缓存中拿到bean
 		Object singletonObject = this.singletonObjects.get(beanName);
+		//缓存中bean为空 且正在创建
 		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
+			//加锁
 			synchronized (this.singletonObjects) {
+				//earlySingletonObject中没有 允许提前创建 解决循环引用
 				singletonObject = this.earlySingletonObjects.get(beanName);
+
+				//如果是工厂Bean
 				if (singletonObject == null && allowEarlyReference) {
+					//这是FactroyBean的创建  调用其getObject方法
 					ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);
 					if (singletonFactory != null) {
+						//工厂去创建新对象
 						singletonObject = singletonFactory.getObject();
+						//优先创建bean 放入early Map
 						this.earlySingletonObjects.put(beanName, singletonObject);
+						//移除工厂
 						this.singletonFactories.remove(beanName);
 					}
 				}
@@ -335,6 +367,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * @see #isSingletonCurrentlyInCreation
 	 */
 	protected void beforeSingletonCreation(String beanName) {
+		//添加  添加失败抛出异常
 		if (!this.inCreationCheckExclusions.contains(beanName) && !this.singletonsCurrentlyInCreation.add(beanName)) {
 			throw new BeanCurrentlyInCreationException(beanName);
 		}
@@ -400,6 +433,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 		synchronized (this.dependentBeanMap) {
 			Set<String> dependentBeans =
 					this.dependentBeanMap.computeIfAbsent(canonicalName, k -> new LinkedHashSet<>(8));
+			//
 			if (!dependentBeans.add(dependentBeanName)) {
 				return;
 			}
@@ -408,6 +442,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 		synchronized (this.dependenciesForBeanMap) {
 			Set<String> dependenciesForBean =
 					this.dependenciesForBeanMap.computeIfAbsent(dependentBeanName, k -> new LinkedHashSet<>(8));
+			//set中加入原始beanName
 			dependenciesForBean.add(canonicalName);
 		}
 	}

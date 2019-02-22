@@ -75,6 +75,7 @@ public class SimpleAliasRegistry implements AliasRegistry {
 					}
 				}
 				checkForAliasCircle(name, alias);
+				//以alias为key  name 为value  注册alias
 				this.aliasMap.put(alias, name);
 				if (logger.isDebugEnabled()) {
 					logger.debug("Alias definition '" + alias + "' registered for name '" + name + "'");
@@ -215,6 +216,7 @@ public class SimpleAliasRegistry implements AliasRegistry {
 		String canonicalName = name;
 		// Handle aliasing...
 		String resolvedName;
+		//用resolvedName 一直在map中递归寻找 key 和 value 的来回赋值
 		do {
 			resolvedName = this.aliasMap.get(canonicalName);
 			if (resolvedName != null) {

@@ -791,6 +791,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition)
 			throws BeanDefinitionStoreException {
 
+		//校验非空
 		Assert.hasText(beanName, "Bean name must not be empty");
 		Assert.notNull(beanDefinition, "BeanDefinition must not be null");
 
@@ -804,13 +805,17 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			}
 		}
 
+		//从CUrrentHashMap中获取指定beanName的BeanDefinition
 		BeanDefinition existingDefinition = this.beanDefinitionMap.get(beanName);
+		//如果存在 不允许覆盖
 		if (existingDefinition != null) {
+
 			if (!isAllowBeanDefinitionOverriding()) {
 				throw new BeanDefinitionStoreException(beanDefinition.getResourceDescription(), beanName,
 						"Cannot register bean definition [" + beanDefinition + "] for bean '" + beanName +
 						"': There is already [" + existingDefinition + "] bound.");
 			}
+			//比较role的大小
 			else if (existingDefinition.getRole() < beanDefinition.getRole()) {
 				// e.g. was ROLE_APPLICATION, now overriding with ROLE_SUPPORT or ROLE_INFRASTRUCTURE
 				if (logger.isWarnEnabled()) {
@@ -819,6 +824,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 							existingDefinition + "] with [" + beanDefinition + "]");
 				}
 			}
+			//相同beanName  不同的BeanDefiniton
 			else if (!beanDefinition.equals(existingDefinition)) {
 				if (logger.isInfoEnabled()) {
 					logger.info("Overriding bean definition for bean '" + beanName +
@@ -833,17 +839,21 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 							"] with [" + beanDefinition + "]");
 				}
 			}
+			//允许覆盖
 			this.beanDefinitionMap.put(beanName, beanDefinition);
 		}
-		else {
-			if (hasBeanCreationStarted()) {
+		else {//如果未存在
+			if (hasBeanCreationStarted()) {//监测创建Bean阶段是否开始  如果开始 需要控制并发
 				// Cannot modify startup-time collection elements anymore (for stable iteration)
 				synchronized (this.beanDefinitionMap) {
+					//加入map
 					this.beanDefinitionMap.put(beanName, beanDefinition);
+					//beanName加入list
 					List<String> updatedDefinitions = new ArrayList<>(this.beanDefinitionNames.size() + 1);
 					updatedDefinitions.addAll(this.beanDefinitionNames);
 					updatedDefinitions.add(beanName);
 					this.beanDefinitionNames = updatedDefinitions;
+					//如果手工单例包含相同的名字 去除这个beanName
 					if (this.manualSingletonNames.contains(beanName)) {
 						Set<String> updatedSingletons = new LinkedHashSet<>(this.manualSingletonNames);
 						updatedSingletons.remove(beanName);
@@ -851,7 +861,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 					}
 				}
 			}
-			else {
+			else {//未开始创建
 				// Still in startup registration phase
 				this.beanDefinitionMap.put(beanName, beanDefinition);
 				this.beanDefinitionNames.add(beanName);
@@ -859,7 +869,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			}
 			this.frozenBeanDefinitionNames = null;
 		}
-
+		//如果单例集合中有这个bean
 		if (existingDefinition != null || containsSingleton(beanName)) {
 			resetBeanDefinition(beanName);
 		}
