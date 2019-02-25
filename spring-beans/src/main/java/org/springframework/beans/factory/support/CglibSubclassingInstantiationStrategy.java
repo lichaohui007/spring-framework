@@ -114,13 +114,16 @@ public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationSt
 		 * @return new instance of the dynamically generated subclass
 		 */
 		public Object instantiate(@Nullable Constructor<?> ctor, @Nullable Object... args) {
+			//通过cglib 创建一个代理类
 			Class<?> subclass = createEnhancedSubclass(this.beanDefinition);
 			Object instance;
 			if (ctor == null) {
+				//没有构造器 使用beanUtils获取构造器创建对象
 				instance = BeanUtils.instantiateClass(subclass);
 			}
 			else {
 				try {
+					//使用代理类的构造器 创建对象
 					Constructor<?> enhancedSubclassConstructor = subclass.getConstructor(ctor.getParameterTypes());
 					instance = enhancedSubclassConstructor.newInstance(args);
 				}
@@ -144,6 +147,7 @@ public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationSt
 		 */
 		private Class<?> createEnhancedSubclass(RootBeanDefinition beanDefinition) {
 			Enhancer enhancer = new Enhancer();
+			//将要创建的类设置为父类
 			enhancer.setSuperclass(beanDefinition.getBeanClass());
 			enhancer.setNamingPolicy(SpringNamingPolicy.INSTANCE);
 			if (this.owner instanceof ConfigurableBeanFactory) {

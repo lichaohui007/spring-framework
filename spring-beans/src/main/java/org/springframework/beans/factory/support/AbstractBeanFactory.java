@@ -237,6 +237,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * @throws BeansException if the bean could not be created
 	 */
 	@SuppressWarnings("unchecked")
+
 	protected <T> T doGetBean(final String name, @Nullable final Class<T> requiredType,
 			@Nullable final Object[] args, boolean typeCheckOnly) throws BeansException {
 
@@ -333,7 +334,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 						//缓存依赖调用
 						registerDependentBean(dep, beanName);
 						try {
-							//获取被依赖的bean
+							//获取被依赖的bean 对所有的依赖对象进行递归创建
 							getBean(dep);
 						}
 						catch (NoSuchBeanDefinitionException ex) {
@@ -354,10 +355,19 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 							// Explicitly remove instance from singleton cache: It might have been put there
 							// eagerly by the creation process, to allow for circular reference resolution.
 							// Also remove any beans that received a temporary reference to the bean.
+							//因为单例模式可能已经存在循环依赖了  所以销毁它
 							destroySingleton(beanName);
 							throw ex;
 						}
 					});
+					/**
+					 * 这个方法主要验证当前的bean是否是FactoryBean
+					 * 如果是  调用FactoryBean实例的getObject()方法
+					 *
+					 * 假如我们需要对工厂bean进行处理  得到的是工厂bean的初始状态 但真正需要的是工厂bean中定义的factroy-method方法返回的bean
+					 *
+					 * getObjectForBeanInstance方法就是完成这项工作的
+					 * */
 					bean = getObjectForBeanInstance(sharedInstance, name, beanName, mbd);
 				}
 

@@ -75,16 +75,20 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	volatile ResolvableType factoryMethodReturnType;
 
 	/** Common lock for the four constructor fields below */
+	//构造函数缓存锁
 	final Object constructorArgumentLock = new Object();
 
 	/** Package-visible field for caching the resolved constructor or factory method */
+	//缓存已经解析的构造函数或工厂方法
 	@Nullable
 	Executable resolvedConstructorOrFactoryMethod;
 
 	/** Package-visible field that marks the constructor arguments as resolved */
+	//标记字段  标记函数 参数已经解析了
 	boolean constructorArgumentsResolved = false;
 
 	/** Package-visible field for caching fully resolved constructor arguments */
+	//缓存已经解析的构造函数参数 包可见 字段
 	@Nullable
 	Object[] resolvedConstructorArguments;
 

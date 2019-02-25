@@ -43,6 +43,7 @@ import org.springframework.util.StringUtils;
  */
 public class SimpleInstantiationStrategy implements InstantiationStrategy {
 
+	//正在创建bean的method对象
 	private static final ThreadLocal<Method> currentlyInvokedFactoryMethod = new ThreadLocal<>();
 
 
@@ -60,6 +61,7 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 	@Override
 	public Object instantiate(RootBeanDefinition bd, @Nullable String beanName, BeanFactory owner) {
 		// Don't override the class with CGLIB if no overrides.
+		//没有用cglib覆盖当前的类 实例化即可
 		if (!bd.hasMethodOverrides()) {
 			Constructor<?> constructorToUse;
 			synchronized (bd.constructorArgumentLock) {
@@ -75,6 +77,7 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 									(PrivilegedExceptionAction<Constructor<?>>) clazz::getDeclaredConstructor);
 						}
 						else {
+							//反射获取构造方法
 							constructorToUse =	clazz.getDeclaredConstructor();
 						}
 						bd.resolvedConstructorOrFactoryMethod = constructorToUse;
@@ -87,6 +90,7 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 			return BeanUtils.instantiateClass(constructorToUse);
 		}
 		else {
+			//生成cglib创建的子类对象
 			// Must generate CGLIB subclass.
 			return instantiateWithMethodInjection(bd, beanName, owner);
 		}
@@ -138,6 +142,7 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 			@Nullable Object factoryBean, final Method factoryMethod, @Nullable Object... args) {
 
 		try {
+			//设置method可访问
 			if (System.getSecurityManager() != null) {
 				AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
 					ReflectionUtils.makeAccessible(factoryMethod);
@@ -147,10 +152,13 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 			else {
 				ReflectionUtils.makeAccessible(factoryMethod);
 			}
-
+			//获取原Method对象
 			Method priorInvokedFactoryMethod = currentlyInvokedFactoryMethod.get();
 			try {
+				//设置新method对象
 				currentlyInvokedFactoryMethod.set(factoryMethod);
+				//反射构造函数生成对象
+				//创建bean对象
 				Object result = factoryMethod.invoke(factoryBean, args);
 				if (result == null) {
 					result = new NullBean();
