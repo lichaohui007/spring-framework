@@ -148,6 +148,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	private final List<StringValueResolver> embeddedValueResolvers = new CopyOnWriteArrayList<>();
 
 	/** BeanPostProcessors to apply in createBean */
+
 	private final List<BeanPostProcessor> beanPostProcessors = new CopyOnWriteArrayList<>();
 
 	/** Indicates whether any InstantiationAwareBeanPostProcessors have been registered */
@@ -367,6 +368,16 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					 * 假如我们需要对工厂bean进行处理  得到的是工厂bean的初始状态 但真正需要的是工厂bean中定义的factroy-method方法返回的bean
 					 *
 					 * getObjectForBeanInstance方法就是完成这项工作的
+					 * 若为单例且单例 Bean 缓存中存在 beanName ，则 <1> 进行后续处理（跳转到下一步），否则，则 <2> 从 FactoryBean 中获取 Bean 实例对象。
+					 * <1.1> 首先，获取锁。其实我们在前面篇幅中发现了大量的同步锁，锁住的对象都是 this.singletonObjects，主要是因为在单例模式中必须要保证全局唯一。
+					 * <1.2> 然后，从 factoryBeanObjectCache 缓存中获取实例对象 object 。若 object 为空，则调用 #doGetObjectFromFactoryBean(FactoryBean<?> factory, String beanName) 方法
+					 * ，从 FactoryBean 获取对象，其实内部就是调用 FactoryBean#getObject() 方法。
+					 * <1.3> 如果需要后续处理( shouldPostProcess = true )，则进行进一步处理，步骤如下：
+					 * 若该 Bean 处于创建中（#isSingletonCurrentlyInCreation(String beanName) 方法返回 true ），则返回非处理的 Bean 对象，而不是存储它。
+					 * 调用 #beforeSingletonCreation(String beanName) 方法，进行创建之前的处理。默认实现将该 Bean 标志为当前创建的。
+					 * 调用 #postProcessObjectFromFactoryBean(Object object, String beanName) 方法，对从 FactoryBean 获取的 Bean 实例对象进行后置处理。
+					 * 调用 #afterSingletonCreation(String beanName) 方法，进行创建 Bean 之后的处理，默认实现是将该 bean 标记为不再在创建中。
+					 * <1.4> 最后，加入到 factoryBeanObjectCache 缓存中。
 					 * */
 					bean = getObjectForBeanInstance(sharedInstance, name, beanName, mbd);
 				}
@@ -385,6 +396,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				}
 
 				else {
+					//request 每次http请求都会有各自的bean
+					//session 一个http session 中  一个bean定义对应一个bean实例
+					// global session 一个全局的http session ，一个bean定义对应一个bean实例
 					//从指定的scope下创建bean
 					String scopeName = mbd.getScope();
 					final Scope scope = this.scopes.get(scopeName);

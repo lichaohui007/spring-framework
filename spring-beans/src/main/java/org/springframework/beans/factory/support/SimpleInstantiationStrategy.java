@@ -90,6 +90,9 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 			return BeanUtils.instantiateClass(constructorToUse);
 		}
 		else {
+
+
+			//是否需要覆盖或者替换掉方法  因为覆盖或者织入的话 需要动态代理将方法织入  这时候选择cglib的方式来实例化 否则直接利用反射就好
 			//生成cglib创建的子类对象
 			// Must generate CGLIB subclass.
 			return instantiateWithMethodInjection(bd, beanName, owner);
