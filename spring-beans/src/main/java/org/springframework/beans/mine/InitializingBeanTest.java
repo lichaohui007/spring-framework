@@ -2,6 +2,7 @@ package org.springframework.beans.mine;
 
 import org.springframework.beans.factory.InitializingBean;
 
+//afterPropertiesSet
 public class InitializingBeanTest implements InitializingBean {
 
 	private String name;

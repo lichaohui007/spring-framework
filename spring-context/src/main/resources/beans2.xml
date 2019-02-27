@@ -7,12 +7,21 @@
 
 	<myTag:user id="user" email="12233445566@qq.com" userName="chenssy" />
 
-	<bean id="pp" class="org.springframework.beans.mine.BeanPostProcessorTest"/>
 
-	<bean id="ii" class="org.springframework.beans.mine.InitializingBeanTest">
-		<property name="name" value="chenssy 1 号"/>
+	<!--调用afterPropertySet 进行属性注入-->
+	<bean id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">
+		<property name="converters">
+			<set>
+				<ref bean="studentConversionService"/>
+			</set>
+		</property>
 	</bean>
 
+	<bean id="studentConversionService" class="org.springframework.beans.mine.StudentConversionService">
+	</bean>
 
+	<bean id="student" class="org.springframework.beans.mine.Student">
+		<property name="studentService" value="18#lichaohui"/>
+	</bean>
 
 </beans>

@@ -1456,6 +1456,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		//将属性应用到bean中
 		if (pvs != null) {
 			//将获取的属性封装在PropertyValues 实例对象pvs 并没有应用到已经实例化的bean中
+			/***
+			 * 容器将xml文件中的<bean></>解析为BeanDefinition BeanDefinition 定义了一个bean需要的所有信息 属性  这些属性是以string存储的  将这些string转化为属性真正的类型
+			 *	将BeanDefinition 中定义的属性值翻译为PropertyValue
+			 *
+			 */
 			applyPropertyValues(beanName, mbd, bw, pvs);
 		}
 	}
@@ -1776,17 +1781,26 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 	/**
 	 * Convert the given value for the specified target property.
+	 * 容器的扩展性在于  启动时的发现  以及使用是对这些扩展点的非空判断
 	 */
 	@Nullable
 	private Object convertForProperty(
 			@Nullable Object value, String propertyName, BeanWrapper bw, TypeConverter converter) {
 
+		// 若 TypeConverter 为BeanWrapperImpl 类型 则使用 BeanWrapper 进行类型转换
+		// 这是因为 BeanWrapperImpl 实现了 PropertyEditorRegistry 接口
 		if (converter instanceof BeanWrapperImpl) {
 			return ((BeanWrapperImpl) converter).convertForProperty(value, propertyName);
 		}
 		else {
+			//获取属性对应的 Propertyesciptor 对象
+			//property和 getxxx setxxx方法绑定
 			PropertyDescriptor pd = bw.getPropertyDescriptor(propertyName);
+			//对象上可以承载很多属性
+			//setter Method  调用setxxx方法进行诸如
 			MethodParameter methodParam = BeanUtils.getWriteMethodParameter(pd);
+			//执行转换
+			//获取该property 所需的类型 及方法参数  该属性是否满足要求
 			return converter.convertIfNecessary(value, pd.getPropertyType(), methodParam);
 		}
 	}
@@ -1964,6 +1978,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		String initMethodName = mbd.getInitMethodName();
 		Assert.state(initMethodName != null, "No init method set");
+		//在mbd中查找initMethod对象
 		final Method initMethod = (mbd.isNonPublicAccessAllowed() ?
 				BeanUtils.findMethod(bean.getClass(), initMethodName) :
 				ClassUtils.getMethodIfAvailable(bean.getClass(), initMethodName));

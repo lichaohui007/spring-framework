@@ -7,6 +7,7 @@ import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.lang.Nullable;
 
+//后置处理器BeanPostProcessor
 public class BeanPostProcessorTest implements BeanPostProcessor {
 
 	@Override

@@ -83,6 +83,7 @@ public class GenericConversionService implements ConfigurableConversionService {
 
 	@Override
 	public void addConverter(Converter<?, ?> converter) {
+		//获取 ResolvaleType 基于 converter.getClass 类
 		ResolvableType[] typeInfo = getRequiredTypeInfo(converter.getClass(), Converter.class);
 		if (typeInfo == null && converter instanceof DecoratingProxy) {
 			typeInfo = getRequiredTypeInfo(((DecoratingProxy) converter).getDecoratedClass(), Converter.class);
@@ -91,6 +92,7 @@ public class GenericConversionService implements ConfigurableConversionService {
 			throw new IllegalArgumentException("Unable to determine source type <S> and target type <T> for your " +
 					"Converter [" + converter.getClass().getName() + "]; does the class parameterize those types?");
 		}
+		//封装成 ConverterAdapter 添加到converters中
 		addConverter(new ConverterAdapter(converter, typeInfo[0], typeInfo[1]));
 	}
 
@@ -178,19 +180,25 @@ public class GenericConversionService implements ConfigurableConversionService {
 	@Nullable
 	public Object convert(@Nullable Object source, @Nullable TypeDescriptor sourceType, TypeDescriptor targetType) {
 		Assert.notNull(targetType, "Target type to convert to cannot be null");
+		//如果null类型 直接返回
 		if (sourceType == null) {
 			Assert.isTrue(source == null, "Source must be [null] if source type == [null]");
 			return handleResult(null, targetType, convertNullSource(null, targetType));
 		}
+		//如果类型不对  则直接抛出异常
 		if (source != null && !sourceType.getObjectType().isInstance(source)) {
 			throw new IllegalArgumentException("Source to convert from must be an instance of [" +
 					sourceType + "]; instead it was a [" + source.getClass().getName() + "]");
 		}
+		//获取对应的 GenericConverter 对象
 		GenericConverter converter = getConverter(sourceType, targetType);
 		if (converter != null) {
+			//如果converter 非空 则进行转换 然后在处理结果
 			Object result = ConversionUtils.invokeConverter(converter, source, sourceType, targetType);
+			//处理结果
 			return handleResult(sourceType, targetType, result);
 		}
+		//处理conveter为空的情况
 		return handleConverterNotFound(source, sourceType, targetType);
 	}
 
@@ -251,14 +259,21 @@ public class GenericConversionService implements ConfigurableConversionService {
 	 */
 	@Nullable
 	protected GenericConverter getConverter(TypeDescriptor sourceType, TypeDescriptor targetType) {
+		//判断是否有类型的映射关系
+		//创建ConverterCacheKey对象
 		ConverterCacheKey key = new ConverterCacheKey(sourceType, targetType);
+		//从缓存中获得 GenericConverter
 		GenericConverter converter = this.converterCache.get(key);
+
+		//如果获得  则返回
 		if (converter != null) {
 			return (converter != NO_MATCH ? converter : null);
 		}
 
+		//从converters中查找
 		converter = this.converters.find(sourceType, targetType);
 		if (converter == null) {
+			//查找不到 先从默认的映射关系中获取
 			converter = getDefaultConverter(sourceType, targetType);
 		}
 
@@ -266,7 +281,7 @@ public class GenericConversionService implements ConfigurableConversionService {
 			this.converterCache.put(key, converter);
 			return converter;
 		}
-
+		//所有都没有找到 将这种映射关系否定
 		this.converterCache.put(key, NO_MATCH);
 		return null;
 	}
@@ -496,18 +511,23 @@ public class GenericConversionService implements ConfigurableConversionService {
 
 	/**
 	 * Manages all converters registered with the service.
+	 * 管理所有converter的注入
 	 */
 	private static class Converters {
 
 		private final Set<GenericConverter> globalConverters = new LinkedHashSet<>();
 
+		//维护能够转换这个映射关系的类
 		private final Map<ConvertiblePair, ConvertersForPair> converters = new LinkedHashMap<>(36);
 
 		public void add(GenericConverter converter) {
+			//获取自己支持的转化类型
 			Set<ConvertiblePair> convertibleTypes = converter.getConvertibleTypes();
 			if (convertibleTypes == null) {
 				Assert.state(converter instanceof ConditionalConverter,
 						"Only conditional converters may return null convertible types");
+				//在全局中添加自己支持的类型映射
+				//操作外部类的属性
 				this.globalConverters.add(converter);
 			}
 			else {
@@ -519,6 +539,7 @@ public class GenericConversionService implements ConfigurableConversionService {
 		}
 
 		private ConvertersForPair getMatchableConverters(ConvertiblePair convertiblePair) {
+			//获取这个映射关系的转换对象
 			ConvertersForPair convertersForPair = this.converters.get(convertiblePair);
 			if (convertersForPair == null) {
 				convertersForPair = new ConvertersForPair();
@@ -561,6 +582,7 @@ public class GenericConversionService implements ConfigurableConversionService {
 				TypeDescriptor targetType, ConvertiblePair convertiblePair) {
 
 			// Check specifically registered converters
+			//从注册的converters 找出对应的注册关系
 			ConvertersForPair convertersForPair = this.converters.get(convertiblePair);
 			if (convertersForPair != null) {
 				GenericConverter converter = convertersForPair.getConverter(sourceType, targetType);
