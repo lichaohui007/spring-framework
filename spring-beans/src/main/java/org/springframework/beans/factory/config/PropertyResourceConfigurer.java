@@ -77,11 +77,14 @@ public abstract class PropertyResourceConfigurer extends PropertiesLoaderSupport
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		try {
+			//返回合并的Properties 实例
 			Properties mergedProps = mergeProperties();
 
+			//转换合并属性
 			// Convert the merged properties, if necessary.
 			convertProperties(mergedProps);
 
+			//子类处理
 			// Let the subclass process the properties.
 			processProperties(beanFactory, mergedProps);
 		}

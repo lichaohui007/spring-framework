@@ -124,15 +124,18 @@ public class PropertyPlaceholderHelper {
 		return parseStringValue(value, placeholderResolver, new HashSet<>());
 	}
 
+	//占位符 ${} 替换
 	protected String parseStringValue(
 			String value, PlaceholderResolver placeholderResolver, Set<String> visitedPlaceholders) {
 
 		StringBuilder result = new StringBuilder(value);
 
+		//获取${的索引位置
 		int startIndex = value.indexOf(this.placeholderPrefix);
 		while (startIndex != -1) {
 			int endIndex = findPlaceholderEndIndex(result, startIndex);
 			if (endIndex != -1) {
+				//截取 ${ } 中间的内容 即配置文件中的key
 				String placeholder = result.substring(startIndex + this.placeholderPrefix.length(), endIndex);
 				String originalPlaceholder = placeholder;
 				if (!visitedPlaceholders.add(originalPlaceholder)) {
@@ -140,14 +143,22 @@ public class PropertyPlaceholderHelper {
 							"Circular placeholder reference '" + originalPlaceholder + "' in property definitions");
 				}
 				// Recursive invocation, parsing placeholders contained in the placeholder key.
+				//解析占位符对应的真正的值
 				placeholder = parseStringValue(placeholder, placeholderResolver, visitedPlaceholders);
 				// Now obtain the value for the fully resolved key...
+				//从配置文件中获取placeHolder对应的值propVal
 				String propVal = placeholderResolver.resolvePlaceholder(placeholder);
+				//如果不存在
 				if (propVal == null && this.valueSeparator != null) {
+					//查找 ：的位置
 					int separatorIndex = placeholder.indexOf(this.valueSeparator);
+					//如果存在 ：
 					if (separatorIndex != -1) {
+						//获取 ： 前面部分 actualPlaceholder
 						String actualPlaceholder = placeholder.substring(0, separatorIndex);
+						//获取 ： 后面部分 defaultValue
 						String defaultValue = placeholder.substring(separatorIndex + this.valueSeparator.length());
+						//从 Properties 中获取 actualPlaceholder 对应的值
 						propVal = placeholderResolver.resolvePlaceholder(actualPlaceholder);
 						if (propVal == null) {
 							propVal = defaultValue;

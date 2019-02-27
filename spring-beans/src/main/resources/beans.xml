@@ -7,4 +7,10 @@
 
 	<myTag:user id="user" email="12233445566@qq.com" userName="chenssy" />
 
+	<bean id="pp" class="org.springframework.beans.mine.BeanPostProcessorTest"/>
+
+	<bean id="ii" class="org.springframework.beans.mine.InitializingBeanTest">
+		<property name="name" value="chenssy 1 号"/>
+	</bean>
+
 </beans>

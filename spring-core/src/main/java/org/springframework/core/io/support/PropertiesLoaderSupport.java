@@ -170,6 +170,16 @@ public abstract class PropertiesLoaderSupport {
 	 * @param props the Properties instance to load into
 	 * @throws IOException in case of I/O errors
 	 * @see #setLocations
+	 *
+	 * <bean id="PropertyPlaceholderConfigurer" class="org.springframework.core.custom.CustomPropertyConfig">
+	 *     <property name="locations">
+	 *         <list>
+	 *             <value>classpath:config/application-dev.properties</value>
+	 *             <value>classpath:config/application-test.properties</value>
+	 *             <value>classpath:config/application-prod.properties</value>
+	 *         </list>
+	 *     </property>
+	 * </bean>
 	 */
 	protected void loadProperties(Properties props) throws IOException {
 		if (this.locations != null) {

@@ -143,9 +143,12 @@ public class BeanDefinitionVisitor {
 
 	protected void visitPropertyValues(MutablePropertyValues pvs) {
 		PropertyValue[] pvArray = pvs.getPropertyValues();
+		//遍历PropertyValue 数组
 		for (PropertyValue pv : pvArray) {
+			//解析真值 递归调用为基本类型
 			Object newVal = resolveValue(pv.getValue());
 			if (!ObjectUtils.nullSafeEquals(newVal, pv.getValue())) {
+				//设置到 PropertyValue 中 用新值覆盖旧值
 				pvs.add(pv.getName(), newVal);
 			}
 		}
@@ -238,6 +241,7 @@ public class BeanDefinitionVisitor {
 	protected void visitList(List listVal) {
 		for (int i = 0; i < listVal.size(); i++) {
 			Object elem = listVal.get(i);
+			//进行递归解析
 			Object newVal = resolveValue(elem);
 			if (!ObjectUtils.nullSafeEquals(newVal, elem)) {
 				listVal.set(i, newVal);
