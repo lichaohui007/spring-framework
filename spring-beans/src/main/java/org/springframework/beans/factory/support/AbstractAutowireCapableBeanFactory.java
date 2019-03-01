@@ -433,6 +433,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			if (current == null) {
 				return result;
 			}
+			//将代理类赋值后返回
 			result = current;
 		}
 		return result;

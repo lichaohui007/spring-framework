@@ -42,12 +42,16 @@ import org.springframework.aop.SpringProxy;
  * @see AdvisedSupport#setOptimize
  * @see AdvisedSupport#setProxyTargetClass
  * @see AdvisedSupport#setInterfaces
+ *
+ * proxy-target-class没有配置或者proxy-target-class="false"，返回JdkDynamicAopProxy
+ * proxy-target-class="true"或者<bean>对象没有实现任何接口或者只实现了SpringProxy接口，返回Cglib2AopProxy
  */
 @SuppressWarnings("serial")
 public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
 
 	@Override
 	public AopProxy createAopProxy(AdvisedSupport config) throws AopConfigException {
+		//proxyConfig 的isOptimize 是true  proxy-target-class="true"  config没有实现任何接口
 		if (config.isOptimize() || config.isProxyTargetClass() || hasNoUserSuppliedProxyInterfaces(config)) {
 			Class<?> targetClass = config.getTargetClass();
 			if (targetClass == null) {

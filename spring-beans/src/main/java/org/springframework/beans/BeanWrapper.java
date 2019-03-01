@@ -45,7 +45,23 @@ import java.beans.PropertyDescriptor;
  * @see org.springframework.beans.factory.BeanFactory
  * @see org.springframework.validation.BeanPropertyBindingResult
  * @see org.springframework.validation.DataBinder#initBeanPropertyAccess()
+ *
+ * 继承了三个核心接口 PropertyAccessor PropertyEditor TypeConverter
+ *
+ * propertyAccessor
+ * #isReadableProperty(String propertyName) 方法：判断指定 property 是否可读，是否包含 getter 方法。
+ * #isWritableProperty(String propertyName) 方法：判断指定 property 是否可写,是否包含 setter 方法。
+ * #getPropertyType(...) 方法：获取指定 propertyName 的类型
+ * #setPropertyValue(...) 方法：设置指定 propertyValue
+ *
+ * BeanWrapper 接口的默认实现，用于对Bean的包装，实现上面接口所定义的功能很简单包括设置获取被包装的对象，获取被包装bean的属性描述器\
+ *
+ * #getWrappedInstance() 方法：获取包装对象的实例。
+ * #getWrappedClass() 方法：获取包装对象的类型。
+ * #getPropertyDescriptors() 方法：获取包装对象所有属性的 PropertyDescriptor 就是这个属性的上下文。
+ * #getPropertyDescriptor(String propertyName) 方法：获取包装对象指定属性的上下文。
  */
+
 public interface BeanWrapper extends ConfigurablePropertyAccessor {
 
 	/**

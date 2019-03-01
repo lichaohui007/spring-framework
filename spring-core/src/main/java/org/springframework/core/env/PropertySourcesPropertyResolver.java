@@ -28,6 +28,8 @@ import org.springframework.lang.Nullable;
  * @see PropertySource
  * @see PropertySources
  * @see AbstractEnvironment
+ *
+ * PropertyResolver 的实现者
  */
 public class PropertySourcesPropertyResolver extends AbstractPropertyResolver {
 
@@ -82,12 +84,15 @@ public class PropertySourcesPropertyResolver extends AbstractPropertyResolver {
 					logger.trace("Searching for key '" + key + "' in PropertySource '" +
 							propertySource.getName() + "'");
 				}
+				//解析key对应的value值
 				Object value = propertySource.getProperty(key);
 				if (value != null) {
+					//如果有嵌套占位符 解析嵌套
 					if (resolveNestedPlaceholders && value instanceof String) {
 						value = resolveNestedPlaceholders((String) value);
 					}
 					logKeyFound(key, propertySource, value);
+					//对value进行类型转换
 					return convertValueIfNecessary(value, targetValueType);
 				}
 			}

@@ -1569,7 +1569,7 @@ public class BeanDefinitionParserDelegate {
 		if (namespaceUri == null) {
 			return null;
 		}
-		//
+		//将自定义的namespace解析器 注册到handlerMappings 即spring的环境中  放入namespaceHandler的parses 的map中  将element 与 parser 关联起来
 		NamespaceHandler handler = this.readerContext.getNamespaceHandlerResolver().resolve(namespaceUri);
 		if (handler == null) {
 			error("Unable to locate Spring NamespaceHandler for XML schema namespace [" + namespaceUri + "]", ele);

@@ -87,7 +87,9 @@ public class ConversionServiceFactoryBean implements FactoryBean<ConversionServi
 
 
 	// implementing FactoryBean
-
+	//获得conversionService 对象
+	//返回注入的对象
+	//也可以自定义
 	@Override
 	@Nullable
 	public ConversionService getObject() {

@@ -149,11 +149,15 @@ public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationSt
 			Enhancer enhancer = new Enhancer();
 			//将要创建的类设置为父类
 			enhancer.setSuperclass(beanDefinition.getBeanClass());
+			//设置spring的命名策略
 			enhancer.setNamingPolicy(SpringNamingPolicy.INSTANCE);
 			if (this.owner instanceof ConfigurableBeanFactory) {
 				ClassLoader cl = ((ConfigurableBeanFactory) this.owner).getBeanClassLoader();
 				enhancer.setStrategy(new ClassLoaderAwareGeneratorStrategy(cl));
 			}
+			//过滤 自定义逻辑来指定调用的callback 下标
+
+			//根据beanDefinition定义的MethodOverride不同 返回不同的下标 拦截到不同的方法
 			enhancer.setCallbackFilter(new MethodOverrideCallbackFilter(beanDefinition));
 			enhancer.setCallbackTypes(CALLBACK_TYPES);
 			return enhancer.createClass();

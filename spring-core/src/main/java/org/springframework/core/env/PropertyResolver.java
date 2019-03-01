@@ -26,13 +26,25 @@ import org.springframework.lang.Nullable;
  * @since 3.1
  * @see Environment
  * @see PropertySourcesPropertyResolver
+ *
+ * PropertySource 属性源 key-value 属性对抽象 用于配置数据
+ * PropertyResolver 属性解析器 用于解析属性配置
+ * Profile 剖面 只有激活的剖面才能注册到Spring容器中
+ * Environment  Profile 和 PropertyResolver的组合
+ *
+ *
+ * ConfigurablePropertyResolver 提供属性类型转换的功能
+ * AbstractPropertyResolver 解析属性文件的抽象基类
+ * PropertySourcesPropertyResolver：PropertyResolver 的实现者 它对一组PropertySources 提供属性解析服务
  */
 public interface PropertyResolver {
 
 	/**
 	 * Return whether the given property key is available for resolution,
 	 * i.e. if the value for the given key is not {@code null}.
+	 * 是否包含某个属性
 	 */
+
 	boolean containsProperty(String key);
 
 	/**
@@ -87,6 +99,7 @@ public interface PropertyResolver {
 	 * Return the property value associated with the given key, converted to the given
 	 * targetType (never {@code null}).
 	 * @throws IllegalStateException if the given key cannot be resolved
+	 * 获取指定类型的属性值 的不到抛出异常IllegalStateException
 	 */
 	<T> T getRequiredProperty(String key, Class<T> targetType) throws IllegalStateException;
 
@@ -99,7 +112,8 @@ public interface PropertyResolver {
 	 * @throws IllegalArgumentException if given text is {@code null}
 	 * @see #resolveRequiredPlaceholders
 	 * @see org.springframework.util.SystemPropertyUtils#resolvePlaceholders(String)
-	 */
+	 * 替换文本中的占位符 ${key} 找不到不解析
+ 	 */
 	String resolvePlaceholders(String text);
 
 	/**

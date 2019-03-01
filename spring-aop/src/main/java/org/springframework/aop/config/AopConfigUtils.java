@@ -132,6 +132,7 @@ public abstract class AopConfigUtils {
 			return null;
 		}
 
+		//给BeanDefinition 设置 bean class
 		RootBeanDefinition beanDefinition = new RootBeanDefinition(cls);
 		beanDefinition.setSource(source);
 		beanDefinition.getPropertyValues().add("order", Ordered.HIGHEST_PRECEDENCE);

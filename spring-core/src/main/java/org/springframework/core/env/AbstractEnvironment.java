@@ -238,6 +238,7 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	protected Set<String> doGetActiveProfiles() {
 		synchronized (this.activeProfiles) {
 			if (this.activeProfiles.isEmpty()) {
+				//获取配置文件中spring.profiles.active属性
 				String profiles = getProperty(ACTIVE_PROFILES_PROPERTY_NAME);
 				if (StringUtils.hasText(profiles)) {
 					setActiveProfiles(StringUtils.commaDelimitedListToStringArray(
@@ -255,6 +256,7 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 			logger.debug("Activating profiles " + Arrays.asList(profiles));
 		}
 		synchronized (this.activeProfiles) {
+			//清空 activeProfiles
 			this.activeProfiles.clear();
 			for (String profile : profiles) {
 				validateProfile(profile);

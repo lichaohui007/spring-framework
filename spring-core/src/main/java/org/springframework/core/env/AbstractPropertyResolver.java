@@ -42,9 +42,11 @@ public abstract class AbstractPropertyResolver implements ConfigurablePropertyRe
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	//类型转换服务
 	@Nullable
 	private volatile ConfigurableConversionService conversionService;
 
+	//占位符
 	@Nullable
 	private PropertyPlaceholderHelper nonStrictHelper;
 
@@ -60,6 +62,7 @@ public abstract class AbstractPropertyResolver implements ConfigurablePropertyRe
 	@Nullable
 	private String valueSeparator = SystemPropertyUtils.VALUE_SEPARATOR;
 
+	//必须要有的字段值
 	private final Set<String> requiredProperties = new LinkedHashSet<>();
 
 
@@ -233,6 +236,8 @@ public abstract class AbstractPropertyResolver implements ConfigurablePropertyRe
 				this.valueSeparator, ignoreUnresolvablePlaceholders);
 	}
 
+	//text 待解析的字符串
+	//PropertyPlaceholderHelper： 用于解析占位符的工具类
 	private String doResolvePlaceholders(String text, PropertyPlaceholderHelper helper) {
 		return helper.replacePlaceholders(text, this::getPropertyAsRawString);
 	}

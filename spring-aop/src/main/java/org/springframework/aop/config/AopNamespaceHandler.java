@@ -51,6 +51,10 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
  * @author Adrian Colyer
  * @author Juergen Hoeller
  * @since 2.0
+ *
+ * 1.加载bean的时候有过特殊的处理
+ * 2.getBean有过特殊的处理
+ *
  */
 public class AopNamespaceHandler extends NamespaceHandlerSupport {
 
@@ -59,6 +63,7 @@ public class AopNamespaceHandler extends NamespaceHandlerSupport {
 	 * '{@code config}', '{@code spring-configured}', '{@code aspectj-autoproxy}'
 	 * and '{@code scoped-proxy}' tags.
 	 */
+	//在解析自定义标签的时候 init方法会被调用
 	@Override
 	public void init() {
 		// In 2.0 XSD as well as in 2.1 XSD.

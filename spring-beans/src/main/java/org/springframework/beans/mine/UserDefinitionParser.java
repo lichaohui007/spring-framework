@@ -25,7 +25,7 @@ public class UserDefinitionParser extends AbstractSingleBeanDefinitionParser {
 		if(StringUtils.hasText(userName)){
 			builder.addPropertyValue("userName",userName);
 		}
-
+		//builder中包含beanDefinition
 		if(StringUtils.hasText(email)){
 			builder.addPropertyValue("email",email);
 		}

@@ -64,6 +64,8 @@ public class BeanFactoryAdvisorRetrievalHelper {
 	 * @return the list of {@link org.springframework.aop.Advisor} beans
 	 * @see #isEligibleBean
 	 */
+	//获得advisor 的所有bean  所有继承了Advisor的bean
+	//有两个候选Advisor，分别是<aop:aspect>节点下的<aop:before>和<aop:after>这两个，这两个在XML解析的时候已经被转换生成了RootBeanDefinition。
 	public List<Advisor> findAdvisorBeans() {
 		// Determine list of advisor bean names, if not cached already.
 		String[] advisorNames = this.cachedAdvisorBeanNames;

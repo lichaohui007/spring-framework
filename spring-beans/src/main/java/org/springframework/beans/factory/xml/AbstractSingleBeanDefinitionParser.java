@@ -60,6 +60,8 @@ public abstract class AbstractSingleBeanDefinitionParser extends AbstractBeanDef
 	 */
 	@Override
 	protected final AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
+
+		//beanDefinition 出现的位置
 		//创建BeanDefinitionBuilder对象
 		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition();
 		//获取父类元素
@@ -95,7 +97,7 @@ public abstract class AbstractSingleBeanDefinitionParser extends AbstractBeanDef
 		}
 		//调用自定义解释实现 属性值放入builder
 		doParse(element, parserContext, builder);
-
+		//builder 对象中存储BeanDefinition
 		return builder.getBeanDefinition();
 	}
 

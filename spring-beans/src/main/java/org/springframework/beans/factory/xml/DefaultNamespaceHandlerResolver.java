@@ -133,6 +133,7 @@ public class DefaultNamespaceHandlerResolver implements NamespaceHandlerResolver
 				}
 				//在spring.handlers 中拿到 类全名  反射生成  解析实例
 				NamespaceHandler namespaceHandler = (NamespaceHandler) BeanUtils.instantiateClass(handlerClass);
+				//调用handler 加入parser   钩子方法
 				namespaceHandler.init();
 				handlerMappings.put(namespaceUri, namespaceHandler);
 				return namespaceHandler;

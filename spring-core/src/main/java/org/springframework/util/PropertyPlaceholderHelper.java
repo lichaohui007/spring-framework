@@ -146,6 +146,7 @@ public class PropertyPlaceholderHelper {
 				//解析占位符对应的真正的值
 				placeholder = parseStringValue(placeholder, placeholderResolver, visitedPlaceholders);
 				// Now obtain the value for the fully resolved key...
+				//递归调用 多层嵌套 如 ${${name}}
 				//从配置文件中获取placeHolder对应的值propVal
 				String propVal = placeholderResolver.resolvePlaceholder(placeholder);
 				//如果不存在
