@@ -87,6 +87,7 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 	@Nullable
 	private ConfigurableEnvironment environment;
 
+	//必须配置的属性集合
 	private final Set<String> requiredProperties = new HashSet<>(4);
 
 
@@ -109,6 +110,9 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 	 * provided by default.
 	 * @throws IllegalArgumentException if environment is not assignable to
 	 * {@code ConfigurableEnvironment}
+	 *
+	 * 实现Aware接口 在bean初始化的时候调用相应的接口
+	 *
 	 */
 	@Override
 	public void setEnvironment(Environment environment) {
@@ -139,6 +143,7 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 	}
 
 	/**
+	 * 映射配置文件的参数到这个servlet 在子类初始时话的时候
 	 * Map config parameters onto bean properties of this servlet, and
 	 * invoke subclass initialization.
 	 * @throws ServletException if bean properties are invalid (or required
@@ -151,11 +156,14 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 		}
 
 		// Set bean properties from init parameters.
+		//解析<init-param> 封装到pvs中
 		PropertyValues pvs = new ServletConfigPropertyValues(getServletConfig(), this.requiredProperties);
 		if (!pvs.isEmpty()) {
 			try {
+				//将当期的servlet转化为BeanWrapper 可以放置到spring的容器中
 				BeanWrapper bw = PropertyAccessorFactory.forBeanPropertyAccess(this);
 				ResourceLoader resourceLoader = new ServletContextResourceLoader(getServletContext());
+				//注册自定义的属性编辑器
 				bw.registerCustomEditor(Resource.class, new ResourceEditor(resourceLoader, getEnvironment()));
 				initBeanWrapper(bw);
 				bw.setPropertyValues(pvs, true);

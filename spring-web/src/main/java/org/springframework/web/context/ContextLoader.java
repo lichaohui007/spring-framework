@@ -138,6 +138,7 @@ public class ContextLoader {
 		// Load default strategy implementations from properties file.
 		// This is currently strictly internal and not meant to be customized
 		// by application developers.
+		//加载ContextLoader.properties文件  文件里配置了默认的xmlWebApplicationContext
 		try {
 			ClassPathResource resource = new ClassPathResource(DEFAULT_STRATEGIES_PATH, ContextLoader.class);
 			defaultStrategies = PropertiesLoaderUtils.loadProperties(resource);
@@ -258,6 +259,7 @@ public class ContextLoader {
 	 * @see #CONFIG_LOCATION_PARAM
 	 */
 	public WebApplicationContext initWebApplicationContext(ServletContext servletContext) {
+		//若webApplicationContext.Root 已经初始化过  抛出异常
 		if (servletContext.getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE) != null) {
 			throw new IllegalStateException(
 					"Cannot initialize context because there is already a root application context present - " +
@@ -275,10 +277,13 @@ public class ContextLoader {
 			// Store context in local instance variable, to guarantee that
 			// it is available on ServletContext shutdown.
 			if (this.context == null) {
+				//初始化context  创建context
 				this.context = createWebApplicationContext(servletContext);
 			}
+			//如果是ConfigurableWebApplicationContext的子类 如果未刷新 则进行配置和刷新
 			if (this.context instanceof ConfigurableWebApplicationContext) {
 				ConfigurableWebApplicationContext cwac = (ConfigurableWebApplicationContext) this.context;
+				//未激活 则激活
 				if (!cwac.isActive()) {
 					// The context has not yet been refreshed -> provide services such as
 					// setting the parent context, setting the application context id, etc
@@ -288,12 +293,14 @@ public class ContextLoader {
 						ApplicationContext parent = loadParentContext(servletContext);
 						cwac.setParent(parent);
 					}
+					//获得webApplicationContext 后  配置和刷新webApplicationContext
 					configureAndRefreshWebApplicationContext(cwac, servletContext);
 				}
 			}
 			servletContext.setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, this.context);
 
 			ClassLoader ccl = Thread.currentThread().getContextClassLoader();
+			//如果相同classLoader 加载的容器  则进行容器赋值
 			if (ccl == ContextLoader.class.getClassLoader()) {
 				currentContext = this.context;
 			}
@@ -354,9 +361,11 @@ public class ContextLoader {
 	 * @see org.springframework.web.context.support.XmlWebApplicationContext
 	 */
 	protected Class<?> determineContextClass(ServletContext servletContext) {
+		//从servlet容器中获取contextClass 字符串
 		String contextClassName = servletContext.getInitParameter(CONTEXT_CLASS_PARAM);
 		if (contextClassName != null) {
 			try {
+
 				return ClassUtils.forName(contextClassName, ClassUtils.getDefaultClassLoader());
 			}
 			catch (ClassNotFoundException ex) {
@@ -365,6 +374,7 @@ public class ContextLoader {
 			}
 		}
 		else {
+			//从defaultStrategies 获得该类  XmlWebApplicationContext
 			contextClassName = defaultStrategies.getProperty(WebApplicationContext.class.getName());
 			try {
 				return ClassUtils.forName(contextClassName, ContextLoader.class.getClassLoader());
@@ -376,7 +386,15 @@ public class ContextLoader {
 		}
 	}
 
+	/**
+	 *
+	 * <context-param>
+	 *     <param-name>contextConfigLocation</param-name>
+	 *     <param-value>classpath:config/applicationContext.xml</param-value>
+	 * </context-param>
+	 * */
 	protected void configureAndRefreshWebApplicationContext(ConfigurableWebApplicationContext wac, ServletContext sc) {
+		//如果wac 使用了默认编号  则重新设置id属性
 		if (ObjectUtils.identityToString(wac).equals(wac.getId())) {
 			// The application context id is still set to its original default value
 			// -> assign a more useful id based on available information
@@ -392,6 +410,7 @@ public class ContextLoader {
 		}
 
 		wac.setServletContext(sc);
+		//获取context-param 参数 设置spring context文件的地址
 		String configLocationParam = sc.getInitParameter(CONFIG_LOCATION_PARAM);
 		if (configLocationParam != null) {
 			wac.setConfigLocation(configLocationParam);
@@ -406,6 +425,7 @@ public class ContextLoader {
 		}
 
 		customizeContext(sc, wac);
+		//设置wac属性  进行wac的初始化操作
 		wac.refresh();
 	}
 
