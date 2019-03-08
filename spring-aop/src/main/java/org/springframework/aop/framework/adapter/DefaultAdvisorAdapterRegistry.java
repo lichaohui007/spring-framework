@@ -80,10 +80,13 @@ public class DefaultAdvisorAdapterRegistry implements AdvisorAdapterRegistry, Se
 		List<MethodInterceptor> interceptors = new ArrayList<>(3);
 		Advice advice = advisor.getAdvice();
 		if (advice instanceof MethodInterceptor) {
+			//判断advice 是 MethodInterceptor 加入拦截器链
+			//* 比如 AspectJAfterAdvice 就实现了 MethodInterceptor 接口
 			interceptors.add((MethodInterceptor) advice);
 		}
 		for (AdvisorAdapter adapter : this.adapters) {
 			if (adapter.supportsAdvice(advice)) {
+				//AspectJMethodBeforeAdvice  等类型的通知  由于没有实现MethodInterceptor接口  这里需要通过适配器进行转换
 				interceptors.add(adapter.getInterceptor(advisor));
 			}
 		}

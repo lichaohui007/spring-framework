@@ -106,7 +106,7 @@ class InstantiationModelAwarePointcutAdvisorImpl
 					this.declaredPointcut, preInstantiationPointcut, aspectInstanceFactory);
 			this.lazy = true;
 		}
-		else {
+		else {//非懒加载
 			// A singleton aspect.
 			this.pointcut = this.declaredPointcut;
 			this.lazy = false;

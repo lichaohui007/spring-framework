@@ -143,7 +143,7 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 	}
 
 	/**
-	 * 映射配置文件的参数到这个servlet 在子类初始时话的时候
+	 * 映射配置文件的参数到这个servlet 在子类初始的时候
 	 * Map config parameters onto bean properties of this servlet, and
 	 * invoke subclass initialization.
 	 * @throws ServletException if bean properties are invalid (or required
@@ -156,16 +156,19 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 		}
 
 		// Set bean properties from init parameters.
+		//获取<sevlet>标签中的信息
 		//解析<init-param> 封装到pvs中
 		PropertyValues pvs = new ServletConfigPropertyValues(getServletConfig(), this.requiredProperties);
 		if (!pvs.isEmpty()) {
 			try {
 				//将当期的servlet转化为BeanWrapper 可以放置到spring的容器中
+				//将当前类包装成BeanWrapper
 				BeanWrapper bw = PropertyAccessorFactory.forBeanPropertyAccess(this);
 				ResourceLoader resourceLoader = new ServletContextResourceLoader(getServletContext());
 				//注册自定义的属性编辑器
 				bw.registerCustomEditor(Resource.class, new ResourceEditor(resourceLoader, getEnvironment()));
 				initBeanWrapper(bw);
+				//给spring 裸bean设置属性  以便进行填充
 				bw.setPropertyValues(pvs, true);
 			}
 			catch (BeansException ex) {
@@ -177,6 +180,7 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 		}
 
 		// Let subclasses do whatever initialization they like.
+		//钩子  子类实现初始化的动作
 		initServletBean();
 
 		if (logger.isDebugEnabled()) {
@@ -239,6 +243,7 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 			while (paramNames.hasMoreElements()) {
 				String property = paramNames.nextElement();
 				Object value = config.getInitParameter(property);
+				//将《servlet》配置参数解析为propertyValue
 				addPropertyValue(new PropertyValue(property, value));
 				if (missingProps != null) {
 					missingProps.remove(property);

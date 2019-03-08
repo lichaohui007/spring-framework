@@ -524,10 +524,23 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	 * @see #setContextConfigLocation
 	 */
 	protected WebApplicationContext initWebApplicationContext() {
+		//从ServletContext 中获取容器 也就是ContextLoaderListener 创建的容器 肯定会有这个容器的
 		WebApplicationContext rootContext =
 				WebApplicationContextUtils.getWebApplicationContext(getServletContext());
 		WebApplicationContext wac = null;
 
+		//如果容器不为空
+		/*
+		 * 若下面的条件成立，则需要从外部设置 webApplicationContext。有两个途径可以设置
+		 * webApplicationContext，以 DispatcherServlet 为例：
+		 *    1. 通过 DispatcherServlet 有参构造方法传入 WebApplicationContext 对象
+		 *    2. 将 DispatcherServlet 配置到其他容器中，由其他容器通过
+		 *       setApplicationContext 方法进行设置
+		 *
+		 * 途径1 可参考 AbstractDispatcherServletInitializer 中的
+		 * registerDispatcherServlet 方法源码。一般情况下，代码执行到此处，
+		 * this.webApplicationContext 为 null，大家可自行调试进行验证。
+		 */
 		if (this.webApplicationContext != null) {
 			// A context instance was injected at construction time -> use it
 			wac = this.webApplicationContext;
@@ -569,6 +582,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		if (this.publishContext) {
 			// Publish the context as a servlet context attribute.
 			String attrName = getServletContextAttributeName();
+			//将创建好的容器设置到servletContext
 			getServletContext().setAttribute(attrName, wac);
 			if (this.logger.isDebugEnabled()) {
 				this.logger.debug("Published WebApplicationContext of servlet '" + getServletName() +

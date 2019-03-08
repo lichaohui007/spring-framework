@@ -346,7 +346,9 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 			return bean;
 		}
 		//aop 的标记类 不需要生成代理
+		//如果是基础设施类 （Pointcut Advice Advis or 等接口的实现类  ）
 		if (isInfrastructureClass(bean.getClass()) || shouldSkip(bean.getClass(), beanName)) {
+			//以免下次在进行判断
 			this.advisedBeans.put(cacheKey, Boolean.FALSE);
 			return bean;
 		}
@@ -355,6 +357,10 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		// 创建代理对象 如果有advice   如果有advice 生成代理对象
 		// 在AspectJAwareAdvisorAutoProxyCreator后置处理器BeanPostProcessor 中进行处理
 		//拿到advice 的方法过滤链   advice 关联了 pointcut（目标类）   aspect（增强类） (让两个不想关的类产生关联)
+
+		//在spring加载时先初始化好这个拦截器链  在方法真正调用执行的时候  在invocationHandler中走这个拦截器链
+		//将切面的每个方法对象重新包装成Advice对象   加入到拦截器中   就是说在invocationHandler中  target的方法被反射执行   切面的方法也会被反射执行
+		//在代理方法执行的时候  拦截器中的每个对象是实例化完成的  是对aspect中的每个方法包装的对象
 		Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(bean.getClass(), beanName, null);
 		//过滤出bean数组生成代理对象
 		if (specificInterceptors != DO_NOT_PROXY) {

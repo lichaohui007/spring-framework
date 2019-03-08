@@ -41,12 +41,15 @@ public class AspectJAfterAdvice extends AbstractAspectJAdvice
 	}
 
 
+	//实现MethodInterceptor
 	@Override
 	public Object invoke(MethodInvocation mi) throws Throwable {
 		try {
+			//先回头调用拦截器  回调
 			return mi.proceed();
 		}
 		finally {
+			//拦截器调用完  调用后置处理方法
 			invokeAdviceMethod(getJoinPointMatch(), null, null);
 		}
 	}

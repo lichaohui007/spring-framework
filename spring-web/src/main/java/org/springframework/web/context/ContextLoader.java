@@ -257,6 +257,7 @@ public class ContextLoader {
 	 * @see #ContextLoader(WebApplicationContext)
 	 * @see #CONTEXT_CLASS_PARAM
 	 * @see #CONFIG_LOCATION_PARAM
+	 * 创建容器 → 配置并刷新容器 → 设置容器到 ServletContext 中
 	 */
 	public WebApplicationContext initWebApplicationContext(ServletContext servletContext) {
 		//若webApplicationContext.Root 已经初始化过  抛出异常
@@ -277,7 +278,7 @@ public class ContextLoader {
 			// Store context in local instance variable, to guarantee that
 			// it is available on ServletContext shutdown.
 			if (this.context == null) {
-				//初始化context  创建context
+				//初始化context  创建context 配置共享变量context
 				this.context = createWebApplicationContext(servletContext);
 			}
 			//如果是ConfigurableWebApplicationContext的子类 如果未刷新 则进行配置和刷新
@@ -297,6 +298,7 @@ public class ContextLoader {
 					configureAndRefreshWebApplicationContext(cwac, servletContext);
 				}
 			}
+			//向servletContext 设置spring的容器context
 			servletContext.setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, this.context);
 
 			ClassLoader ccl = Thread.currentThread().getContextClassLoader();
@@ -349,6 +351,7 @@ public class ContextLoader {
 			throw new ApplicationContextException("Custom context class [" + contextClass.getName() +
 					"] is not of type [" + ConfigurableWebApplicationContext.class.getName() + "]");
 		}
+		//反射创建spring容器
 		return (ConfigurableWebApplicationContext) BeanUtils.instantiateClass(contextClass);
 	}
 
@@ -392,6 +395,8 @@ public class ContextLoader {
 	 *     <param-name>contextConfigLocation</param-name>
 	 *     <param-value>classpath:config/applicationContext.xml</param-value>
 	 * </context-param>
+	 *
+	 * 拿到servletContext的数据 生成spring容器 把容器返回给servletContext
 	 * */
 	protected void configureAndRefreshWebApplicationContext(ConfigurableWebApplicationContext wac, ServletContext sc) {
 		//如果wac 使用了默认编号  则重新设置id属性
@@ -413,6 +418,7 @@ public class ContextLoader {
 		//获取context-param 参数 设置spring context文件的地址
 		String configLocationParam = sc.getInitParameter(CONFIG_LOCATION_PARAM);
 		if (configLocationParam != null) {
+			//设置spring配置文件的地址
 			wac.setConfigLocation(configLocationParam);
 		}
 
@@ -423,7 +429,7 @@ public class ContextLoader {
 		if (env instanceof ConfigurableWebEnvironment) {
 			((ConfigurableWebEnvironment) env).initPropertySources(sc, null);
 		}
-
+		//将sevletContext 设置入spring的环境中  这样spring依赖到servlet的数据
 		customizeContext(sc, wac);
 		//设置wac属性  进行wac的初始化操作
 		wac.refresh();
