@@ -124,7 +124,9 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 
 		List<Advisor> advisors = new ArrayList<>();
 		//拿到切面的类
+		//拿到切面类中  不是被@pointcut注解的方法对象   即会返回多个方法对象
 		for (Method method : getAdvisorMethods(aspectClass)) {
+			//为每个方法调用getAdvisor方法
 			Advisor advisor = getAdvisor(method, lazySingletonAspectInstanceFactory, advisors.size(), aspectName);
 			if (advisor != null) {
 				advisors.add(advisor);
@@ -211,6 +213,7 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 		}
 		//设置共享变量 new 出新对
 		//创建Advisor实现类
+		//将每个被@before @After 的方法包装成一个Advice对象
 		return new InstantiationModelAwarePointcutAdvisorImpl(expressionPointcut, candidateAdviceMethod,
 				this, aspectInstanceFactory, declarationOrderInAspect, aspectName);
 	}
@@ -218,6 +221,7 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 	@Nullable
 	private AspectJExpressionPointcut getPointcut(Method candidateAdviceMethod, Class<?> candidateAspectClass) {
 		//获取方法上 @Before @After 的注解
+		//以为上面已经过滤了@pointcut
 		AspectJAnnotation<?> aspectJAnnotation =
 				AbstractAspectJAdvisorFactory.findAspectJAnnotationOnMethod(candidateAdviceMethod);
 		if (aspectJAnnotation == null) {
@@ -228,6 +232,7 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 		AspectJExpressionPointcut ajexp =
 				new AspectJExpressionPointcut(candidateAspectClass, new String[0], new Class<?>[0]);
 		//从注解中获取表达式
+		//获取@Before   @After等注解中的aspectJ表达式
 		ajexp.setExpression(aspectJAnnotation.getPointcutExpression());
 		if (this.beanFactory != null) {
 			ajexp.setBeanFactory(this.beanFactory);

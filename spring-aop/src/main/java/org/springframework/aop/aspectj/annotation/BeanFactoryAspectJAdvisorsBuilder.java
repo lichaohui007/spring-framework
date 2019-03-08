@@ -94,7 +94,7 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 				if (aspectNames == null) {
 					List<Advisor> advisors = new ArrayList<>();
 					aspectNames = new ArrayList<>();
-					//从容器中获取所有 bean 名称
+					//从spring容器中获取所有 bean 名称
 					String[] beanNames = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(
 							this.beanFactory, Object.class, true, false);
 					//遍历所有的beanName
@@ -111,11 +111,13 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 						//查看是否有@Aspect标记
 						if (this.advisorFactory.isAspect(beanType)) {
 							aspectNames.add(beanName);
+							//生成AspectMetadata 对象
 							AspectMetadata amd = new AspectMetadata(beanType, beanName);
 							if (amd.getAjType().getPerClause().getKind() == PerClauseKind.SINGLETON) {
+								//Aspect对象生成工厂
 								MetadataAwareAspectInstanceFactory factory =
 										new BeanFactoryAspectInstanceFactory(this.beanFactory, beanName);
-								//
+								//获取通知器
 								List<Advisor> classAdvisors = this.advisorFactory.getAdvisors(factory);
 								if (this.beanFactory.isSingleton(beanName)) {
 									this.advisorsCache.put(beanName, classAdvisors);
