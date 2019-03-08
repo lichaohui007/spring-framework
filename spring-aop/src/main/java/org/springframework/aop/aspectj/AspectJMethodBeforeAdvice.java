@@ -28,6 +28,11 @@ import org.springframework.lang.Nullable;
  * @author Rod Johnson
  * @author Adrian Colyer
  * @since 2.0
+ *
+ * spring调用构造器生成对象的时候 就已经将切面的方法当做构造器的参数沉淀在advice对象中
+ * 这个Method对象和 target 类要执行的方法不是一个方法
+ *
+ * 在开始阶段 Aspect类拆解成了多个包装Method的Advice对象  放入拦截器链
  */
 @SuppressWarnings("serial")
 public class AspectJMethodBeforeAdvice extends AbstractAspectJAdvice implements MethodBeforeAdvice, Serializable {
