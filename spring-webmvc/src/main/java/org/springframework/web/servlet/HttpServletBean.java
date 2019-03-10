@@ -77,6 +77,8 @@ import org.springframework.web.context.support.StandardServletEnvironment;
  * @see #initServletBean
  * @see #doGet
  * @see #doPost
+ *
+ * 将sevletConfig 设置到Servlet上
  */
 @SuppressWarnings("serial")
 public abstract class HttpServletBean extends HttpServlet implements EnvironmentCapable, EnvironmentAware {
@@ -88,6 +90,7 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 	private ConfigurableEnvironment environment;
 
 	//必须配置的属性集合
+	// 会校验是否有该属性
 	private final Set<String> requiredProperties = new HashSet<>(4);
 
 
@@ -163,6 +166,7 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 			try {
 				//将当期的servlet转化为BeanWrapper 可以放置到spring的容器中
 				//将当前类包装成BeanWrapper
+				//将servlet 想spring的beanWrapper 转化  实现属性的填充
 				BeanWrapper bw = PropertyAccessorFactory.forBeanPropertyAccess(this);
 				ResourceLoader resourceLoader = new ServletContextResourceLoader(getServletContext());
 				//注册自定义的属性编辑器
@@ -236,6 +240,7 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 		public ServletConfigPropertyValues(ServletConfig config, Set<String> requiredProperties)
 				throws ServletException {
 
+			//判断是否缺少必要的属性
 			Set<String> missingProps = (!CollectionUtils.isEmpty(requiredProperties) ?
 					new HashSet<>(requiredProperties) : null);
 

@@ -52,6 +52,8 @@ import org.springframework.lang.Nullable;
  * @see org.springframework.web.servlet.handler.AbstractHandlerMapping
  * @see org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping
  * @see org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
+ *
+ * HandlerMapping  处理器匹配接口  根据请求 获得其请求处理器 （handler） 和  拦截器 HandlerInterceptor 数组
  */
 public interface HandlerMapping {
 

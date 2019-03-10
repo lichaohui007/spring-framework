@@ -58,6 +58,7 @@ public abstract class AbstractDispatcherHandlerInitializer implements WebApplica
 
 	@Override
 	public void onStartup(ServletContext servletContext) throws ServletException {
+		//注册dispatcherServlet
 		registerDispatcherHandler(servletContext);
 	}
 
@@ -77,6 +78,7 @@ public abstract class AbstractDispatcherHandlerInitializer implements WebApplica
 		String servletName = getServletName();
 		Assert.hasLength(servletName, "getServletName() must not return null or empty");
 
+		//创建webApplication对象
 		ApplicationContext applicationContext = createApplicationContext();
 		Assert.notNull(applicationContext, "createApplicationContext() must not return null");
 

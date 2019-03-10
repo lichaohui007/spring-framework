@@ -137,6 +137,25 @@ public class SpringServletContainerInitializer implements ServletContainerInitia
 	 * @param servletContext the servlet context to be initialized
 	 * @see WebApplicationInitializer#onStartup(ServletContext)
 	 * @see AnnotationAwareOrderComparator
+	 *
+	 *
+	 * servlet3.0 首先提供了 @WebServlet，@WebFilter 等注解，这样便有了抛弃 web.xml 的第一个途径，凭借注解声明 servlet 和 filter 来做到这一点。
+	 *
+	 * 除了这种方式，servlet3.0 规范还提供了更强大的功能，可以在运行时动态注册 servlet ，filter，listener。以 servlet 为例，过滤器与监听器与之类似。ServletContext 为动态配置 Servlet 增加了如下方法：
+	 *
+	 * ServletRegistration.Dynamic addServlet(String servletName,Class<? extends Servlet> servletClass)
+	 * ServletRegistration.Dynamic addServlet(String servletName, Servlet servlet)
+	 * ServletRegistration.Dynamic addServlet(String servletName, String className)
+	 * T createServlet(Class clazz)
+	 * ServletRegistration getServletRegistration(String servletName)
+	 * Map<String,? extends ServletRegistration> getServletRegistrations()
+	 * 其中前三个方法的作用是相同的，只是参数类型不同而已；通过 createServlet() 方法创建的 Servlet，通常需要做一些自定义的配置，然后使用 addServlet() 方法来将其动态注册为一个可以用于服务的 Servlet。
+	 * 两个 getServletRegistration() 方法主要用于动态为 Servlet 增加映射信息，这等价于在 web.xml 中使用 标签为存在的 Servlet 增加映射信息。
+	 *
+	 * 以上 ServletContext 新增的方法要么是在 ServletContextListener 的 contexInitialized 方法中调用，要么是在 ServletContainerInitializer 的 onStartup() 方法中调用。
+	 *
+	 * ServletContainerInitializer 也是 Servlet 3.0 新增的一个接口，容器在启动时使用 JAR 服务 API(JAR Service API) 来发现 ServletContainerInitializer 的实现类，
+	 * 并且容器将 WEB-INF/lib 目录下 JAR 包中的类都交给该类的 onStartup() 方法处理，我们通常需要在该实现类上使用 @HandlesTypes 注解来指定希望被处理的类，过滤掉不希望给 onStartup() 处理的类。
 	 */
 	@Override
 	public void onStartup(@Nullable Set<Class<?>> webAppInitializerClasses, ServletContext servletContext)
@@ -148,9 +167,11 @@ public class SpringServletContainerInitializer implements ServletContainerInitia
 			for (Class<?> waiClass : webAppInitializerClasses) {
 				// Be defensive: Some servlet containers provide us with invalid classes,
 				// no matter what @HandlesTypes says...
+				//接口 抽象类  WebApplicationinitializer的父类不会处理
 				if (!waiClass.isInterface() && !Modifier.isAbstract(waiClass.getModifiers()) &&
 						WebApplicationInitializer.class.isAssignableFrom(waiClass)) {
 					try {
+						//调用webApplicationInitializer的子类进行初始化
 						initializers.add((WebApplicationInitializer)
 								ReflectionUtils.accessibleConstructor(waiClass).newInstance());
 					}
