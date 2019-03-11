@@ -138,6 +138,7 @@ public class InternalResourceView extends AbstractUrlBasedView {
 			Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		// Expose the model object as request attributes.
+		// 将model 的数据放入到request
 		exposeModelAsRequestAttributes(model, request);
 
 		// Expose helpers as request attributes, if any.

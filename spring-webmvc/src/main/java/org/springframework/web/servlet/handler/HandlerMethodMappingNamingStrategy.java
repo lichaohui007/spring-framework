@@ -36,6 +36,8 @@ import org.springframework.web.method.HandlerMethod;
  *
  * @author Rossen Stoyanchev
  * @since 4.1
+ *
+ * Handler 的Method 的 Mapping 的名字生成策略接口
  */
 @FunctionalInterface
 public interface HandlerMethodMappingNamingStrategy<T> {

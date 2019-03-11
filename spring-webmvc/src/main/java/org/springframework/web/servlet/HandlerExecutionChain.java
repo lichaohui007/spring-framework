@@ -35,19 +35,31 @@ import org.springframework.util.ObjectUtils;
  * @author Juergen Hoeller
  * @since 20.06.2003
  * @see HandlerInterceptor
+ *
+ * <mvc:interceptors>
+ *     <mvc:interceptor>
+ *         <mvc:mapping path="/interceptor/**" />
+ *         <mvc:exclude-mapping path="/interceptor/b/*" />
+ *         <bean class="com.elim.learn.spring.mvc.interceptor.MyInterceptor" />
+ *     </mvc:interceptor>
+ * </mvc:interceptors>
  */
 public class HandlerExecutionChain {
 
 	private static final Log logger = LogFactory.getLog(HandlerExecutionChain.class);
 
+	//处理器
 	private final Object handler;
 
+	//拦截器数组
 	@Nullable
 	private HandlerInterceptor[] interceptors;
 
+	//拦截器数组  在初始化的时候会调用getInterceptors() 初始化到inteceptor
 	@Nullable
 	private List<HandlerInterceptor> interceptorList;
 
+	//主要用于实现 {@link #applyPostHandle(HttpServletRequest, HttpServletResponse, ModelAndView)} 的逻辑
 	private int interceptorIndex = -1;
 
 
@@ -69,6 +81,7 @@ public class HandlerExecutionChain {
 		if (handler instanceof HandlerExecutionChain) {
 			HandlerExecutionChain originalChain = (HandlerExecutionChain) handler;
 			this.handler = originalChain.getHandler();
+			//将所有的interceptors 初始化到 interceptorList 中
 			this.interceptorList = new ArrayList<>();
 			CollectionUtils.mergeArrayIntoCollection(originalChain.getInterceptors(), this.interceptorList);
 			CollectionUtils.mergeArrayIntoCollection(interceptors, this.interceptorList);
@@ -87,6 +100,7 @@ public class HandlerExecutionChain {
 		return this.handler;
 	}
 
+	//添加拦截器
 	public void addInterceptor(HandlerInterceptor interceptor) {
 		initInterceptorList().add(interceptor);
 	}
@@ -100,6 +114,7 @@ public class HandlerExecutionChain {
 	private List<HandlerInterceptor> initInterceptorList() {
 		if (this.interceptorList == null) {
 			this.interceptorList = new ArrayList<>();
+			// 如果 interceptors 非空，则添加到 interceptorList 中
 			if (this.interceptors != null) {
 				// An interceptor array specified through the constructor
 				CollectionUtils.mergeArrayIntoCollection(this.interceptors, this.interceptorList);
@@ -112,6 +127,7 @@ public class HandlerExecutionChain {
 	/**
 	 * Return the array of interceptors to apply (in the given order).
 	 * @return the array of HandlerInterceptors instances (may be {@code null})
+	 * 返回拦截器数组
 	 */
 	@Nullable
 	public HandlerInterceptor[] getInterceptors() {
@@ -133,13 +149,17 @@ public class HandlerExecutionChain {
 		if (!ObjectUtils.isEmpty(interceptors)) {
 			for (int i = 0; i < interceptors.length; i++) {
 				HandlerInterceptor interceptor = interceptors[i];
+				//前置处理
 				if (!interceptor.preHandle(request, response, this.handler)) {
+					//触发已经完成处理
 					triggerAfterCompletion(request, response, null);
 					return false;
 				}
+				//标记共享拦截器 现在拦截器中的位置
 				this.interceptorIndex = i;
 			}
 		}
+		//返回true 代表全部执行成功
 		return true;
 	}
 
@@ -153,6 +173,7 @@ public class HandlerExecutionChain {
 		if (!ObjectUtils.isEmpty(interceptors)) {
 			for (int i = interceptors.length - 1; i >= 0; i--) {
 				HandlerInterceptor interceptor = interceptors[i];
+				//后置处理拦截器
 				interceptor.postHandle(request, response, this.handler, mv);
 			}
 		}
@@ -171,6 +192,7 @@ public class HandlerExecutionChain {
 			for (int i = this.interceptorIndex; i >= 0; i--) {
 				HandlerInterceptor interceptor = interceptors[i];
 				try {
+					//触发已经完成
 					interceptor.afterCompletion(request, response, this.handler, ex);
 				}
 				catch (Throwable ex2) {

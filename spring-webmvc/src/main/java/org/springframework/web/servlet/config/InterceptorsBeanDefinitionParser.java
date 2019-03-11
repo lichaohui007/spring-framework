@@ -38,6 +38,13 @@ import org.springframework.web.servlet.handler.MappedInterceptor;
  *
  * @author Keith Donald
  * @since 3.0
+ *
+ * 用于解析mvc:interceptor
+ * <mvc:interceptor>
+ *         <mvc:mapping path="/interceptor/**" />
+ *         <mvc:exclude-mapping path="/interceptor/b/*" />
+ *         <bean class="com.elim.learn.spring.mvc.interceptor.MyInterceptor" />
+ *     </mvc:interceptor>
  */
 class InterceptorsBeanDefinitionParser implements BeanDefinitionParser {
 
@@ -61,6 +68,7 @@ class InterceptorsBeanDefinitionParser implements BeanDefinitionParser {
 			ManagedList<String> includePatterns = null;
 			ManagedList<String> excludePatterns = null;
 			Object interceptorBean;
+			//解析<mvc:interceptor>部分
 			if ("interceptor".equals(interceptor.getLocalName())) {
 				includePatterns = getIncludePatterns(interceptor, "mapping");
 				excludePatterns = getIncludePatterns(interceptor, "exclude-mapping");
@@ -70,11 +78,13 @@ class InterceptorsBeanDefinitionParser implements BeanDefinitionParser {
 			else {
 				interceptorBean = context.getDelegate().parsePropertySubElement(interceptor, null);
 			}
+			//构造反射的构造函数对象
 			mappedInterceptorDef.getConstructorArgumentValues().addIndexedArgumentValue(0, includePatterns);
 			mappedInterceptorDef.getConstructorArgumentValues().addIndexedArgumentValue(1, excludePatterns);
 			mappedInterceptorDef.getConstructorArgumentValues().addIndexedArgumentValue(2, interceptorBean);
 
 			if (pathMatcherRef != null) {
+				//给BeanDefinition 添加属性
 				mappedInterceptorDef.getPropertyValues().add("pathMatcher", pathMatcherRef);
 			}
 

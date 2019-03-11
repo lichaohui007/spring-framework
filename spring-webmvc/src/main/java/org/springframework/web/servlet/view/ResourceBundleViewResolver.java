@@ -200,6 +200,7 @@ public class ResourceBundleViewResolver extends AbstractCachingViewResolver
 	protected View loadView(String viewName, Locale locale) throws Exception {
 		BeanFactory factory = initFactory(locale);
 		try {
+			//生成一个View的实例
 			return factory.getBean(viewName, View.class);
 		}
 		catch (NoSuchBeanDefinitionException ex) {

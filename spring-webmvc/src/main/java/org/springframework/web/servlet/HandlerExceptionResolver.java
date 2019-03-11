@@ -48,7 +48,11 @@ public interface HandlerExceptionResolver {
 	 * @param ex the exception that got thrown during handler execution
 	 * @return a corresponding {@code ModelAndView} to forward to,
 	 * or {@code null} for default processing in the resolution chain
+	 *
+	 * 处理器异常解析接口  将处理器handler执行时发生的异常  转换成modelAndView 结果
 	 */
+
+	//解析异常  转换成对应的ModelAndView 结果
 	@Nullable
 	ModelAndView resolveException(
 			HttpServletRequest request, HttpServletResponse response, @Nullable Object handler, Exception ex);

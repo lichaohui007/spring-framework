@@ -888,9 +888,11 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 			throws ServletException, IOException {
 
 		HttpMethod httpMethod = HttpMethod.resolve(request.getMethod());
+		//处理patch 请求
 		if (httpMethod == HttpMethod.PATCH || httpMethod == null) {
 			processRequest(request, response);
 		}
+		//调用父类处理其他请求 get post
 		else {
 			super.service(request, response);
 		}
@@ -948,6 +950,8 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	 * <p>Applies HttpServlet's standard OPTIONS processing otherwise,
 	 * and also if there is still no 'Allow' header set after dispatching.
 	 * @see #doService
+	 *
+	 * //从子类开始调用  当子类重写了父类的方法  调用子类的该方法
 	 */
 	@Override
 	protected void doOptions(HttpServletRequest request, HttpServletResponse response)
@@ -961,8 +965,10 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 			}
 		}
 
+		//如果响应中没有包含请求头Allow
 		// Use response wrapper in order to always add PATCH to the allowed methods
 		super.doOptions(request, new HttpServletResponseWrapper(response) {
+			//给resp 设置Allow
 			@Override
 			public void setHeader(String name, String value) {
 				if ("Allow".equals(name)) {

@@ -39,15 +39,26 @@ public class RequestMappingInfoHandlerMethodMappingNamingStrategy
 	public static final String SEPARATOR = "#";
 
 
+	/**
+	 * 情况1： 如果Mapping已经配置好名字 直接返回  如 @RequestMapping(name="login",value="user/login") 则直接返回Mapping的名字  login
+	 *
+	 * 情况2： 如果mapping未配置名字 则使用 类名大写 + "#" + 方法名 @RequestMapping(value="user/login") 假设它虽在的类为UserController 对应的方法名为login  则它对应的Mapping
+	 * 名字就是 USERCONTROLLER#login
+	 *
+	 * */
 	@Override
 	public String getName(HandlerMethod handlerMethod, RequestMappingInfo mapping) {
+		//如果mapping的名字非空 则使用 mapping 的名字
 		if (mapping.getName() != null) {
 			return mapping.getName();
 		}
+		//
 		StringBuilder sb = new StringBuilder();
+		//使用类名 + "#" + 方法名
 		String simpleTypeName = handlerMethod.getBeanType().getSimpleName();
 		for (int i = 0 ; i < simpleTypeName.length(); i++) {
 			if (Character.isUpperCase(simpleTypeName.charAt(i))) {
+				//从大写的字符开始
 				sb.append(simpleTypeName.charAt(i));
 			}
 		}

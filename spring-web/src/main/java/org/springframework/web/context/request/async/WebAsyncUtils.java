@@ -46,7 +46,9 @@ public abstract class WebAsyncUtils {
 		if (asyncManagerAttr instanceof WebAsyncManager) {
 			asyncManager = (WebAsyncManager) asyncManagerAttr;
 		}
+		//如果为空  设置AsyncAttribute
 		if (asyncManager == null) {
+			//new出WebAsyncManager 对象
 			asyncManager = new WebAsyncManager();
 			servletRequest.setAttribute(WEB_ASYNC_MANAGER_ATTRIBUTE, asyncManager);
 		}

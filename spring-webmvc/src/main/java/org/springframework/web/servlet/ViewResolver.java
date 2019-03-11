@@ -32,8 +32,11 @@ import org.springframework.lang.Nullable;
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @see org.springframework.web.servlet.view.InternalResourceViewResolver
+ * 解析的是JSP视图
  * @see org.springframework.web.servlet.view.ResourceBundleViewResolver
  * @see org.springframework.web.servlet.view.XmlViewResolver
+ *
+ * FreemarkViewResolver 解析的是Freemarker视图
  */
 public interface ViewResolver {
 
@@ -51,6 +54,8 @@ public interface ViewResolver {
 	 * (optional, to allow for ViewResolver chaining)
 	 * @throws Exception if the view cannot be resolved
 	 * (typically in case of problems creating an actual View object)
+	 *
+	 * 根据视图名和国际化  解析出最终的View对象
 	 */
 	@Nullable
 	View resolveViewName(String viewName, Locale locale) throws Exception;

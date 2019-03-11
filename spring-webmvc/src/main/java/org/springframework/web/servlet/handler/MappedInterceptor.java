@@ -41,17 +41,31 @@ import org.springframework.web.servlet.ModelAndView;
  * @author Rossen Stoyanchev
  * @author Brian Clozel
  * @since 3.0
+ *
+ * <mvc:interceptors>
+ *     <mvc:interceptor>
+ *         <mvc:mapping path="/interceptor/**" />
+ *         <mvc:exclude-mapping path="/interceptor/b/*" />
+ *         <bean class="com.elim.learn.spring.mvc.interceptor.MyInterceptor" />
+ *     </mvc:interceptor>
+ * </mvc:interceptors>
+ *
+ *
+ * 每个<mvc:interceptor> 都会被解析为MappedInterceptor
  */
 public final class MappedInterceptor implements HandlerInterceptor {
 
+	//匹配路径
 	@Nullable
 	private final String[] includePatterns;
 
+	//不匹配的路径
 	@Nullable
 	private final String[] excludePatterns;
-
+	//拦截器对象
 	private final HandlerInterceptor interceptor;
 
+	//路径匹配器
 	@Nullable
 	private PathMatcher pathMatcher;
 
@@ -155,6 +169,7 @@ public final class MappedInterceptor implements HandlerInterceptor {
 		if (ObjectUtils.isEmpty(this.includePatterns)) {
 			return true;
 		}
+		//当被过滤的路径不为空
 		for (String pattern : this.includePatterns) {
 			if (pathMatcherToUse.match(pattern, lookupPath)) {
 				return true;
@@ -166,7 +181,7 @@ public final class MappedInterceptor implements HandlerInterceptor {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
-
+		//拦截器方法实现
 		return this.interceptor.preHandle(request, response, handler);
 	}
 

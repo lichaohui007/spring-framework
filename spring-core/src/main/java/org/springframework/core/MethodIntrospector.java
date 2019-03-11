@@ -56,7 +56,9 @@ public abstract class MethodIntrospector {
 		Set<Class<?>> handlerTypes = new LinkedHashSet<>();
 		Class<?> specificHandlerType = null;
 
+		//handler Type 非代理类
 		if (!Proxy.isProxyClass(targetType)) {
+			//获得处理器的真是类型
 			specificHandlerType = ClassUtils.getUserClass(targetType);
 			handlerTypes.add(specificHandlerType);
 		}
