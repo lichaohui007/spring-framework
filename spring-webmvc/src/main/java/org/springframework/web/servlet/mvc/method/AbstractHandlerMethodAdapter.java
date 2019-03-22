@@ -40,6 +40,7 @@ public abstract class AbstractHandlerMethodAdapter extends WebContentGenerator i
 
 	public AbstractHandlerMethodAdapter() {
 		// no restriction of HTTP methods by default
+		// 调用WebContentGenerator 构造方法
 		super(false);
 	}
 
@@ -66,6 +67,7 @@ public abstract class AbstractHandlerMethodAdapter extends WebContentGenerator i
 	 */
 	@Override
 	public final boolean supports(Object handler) {
+		//判断是否是HandlerMethod
 		return (handler instanceof HandlerMethod && supportsInternal((HandlerMethod) handler));
 	}
 

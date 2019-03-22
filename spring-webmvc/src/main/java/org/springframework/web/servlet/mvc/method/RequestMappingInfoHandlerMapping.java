@@ -113,7 +113,7 @@ public abstract class RequestMappingInfoHandlerMapping extends AbstractHandlerMe
 
 		String bestPattern;
 		Map<String, String> uriVariables;
-
+		//路径上的变量集合
 		Set<String> patterns = info.getPatternsCondition().getPatterns();
 		if (patterns.isEmpty()) {
 			bestPattern = lookupPath;
@@ -131,9 +131,11 @@ public abstract class RequestMappingInfoHandlerMapping extends AbstractHandlerMe
 			request.setAttribute(HandlerMapping.MATRIX_VARIABLES_ATTRIBUTE, matrixVars);
 		}
 
+		// 设置 URI_TEMPLATE_VARIABLES_ATTRIBUTE 属性，到请求中
 		Map<String, String> decodedUriVariables = getUrlPathHelper().decodePathVariables(request, uriVariables);
 		request.setAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE, decodedUriVariables);
 
+		// 设置 PRODUCIBLE_MEDIA_TYPES_ATTRIBUTE 属性，到请求中
 		if (!info.getProducesCondition().getProducibleMediaTypes().isEmpty()) {
 			Set<MediaType> mediaTypes = info.getProducesCondition().getProducibleMediaTypes();
 			request.setAttribute(PRODUCIBLE_MEDIA_TYPES_ATTRIBUTE, mediaTypes);

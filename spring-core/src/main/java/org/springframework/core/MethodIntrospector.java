@@ -64,17 +64,20 @@ public final class MethodIntrospector {
 			specificHandlerType = ClassUtils.getUserClass(targetType);
 			handlerTypes.add(specificHandlerType);
 		}
+		//拿到目标类的所有继承接口
 		handlerTypes.addAll(ClassUtils.getAllInterfacesForClassAsSet(targetType));
 
 		for (Class<?> currentHandlerType : handlerTypes) {
 			final Class<?> targetClass = (specificHandlerType != null ? specificHandlerType : currentHandlerType);
 
 			ReflectionUtils.doWithMethods(currentHandlerType, method -> {
+				//通过方法名和参数类型拿到Method 对象  从原生的勒种获取方法对象
 				Method specificMethod = ClassUtils.getMostSpecificMethod(method, targetClass);
 				T result = metadataLookup.inspect(specificMethod);
 				if (result != null) {
 					Method bridgedMethod = BridgeMethodResolver.findBridgedMethod(specificMethod);
 					if (bridgedMethod == specificMethod || metadataLookup.inspect(bridgedMethod) == null) {
+						//包装成method  和  mapping
 						methodMap.put(specificMethod, result);
 					}
 				}

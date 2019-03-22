@@ -59,6 +59,8 @@ public interface HandlerMapping {
 	 * Name of the {@link HttpServletRequest} attribute that contains the mapped
 	 * handler for the best matching pattern.
 	 * @since 4.3.21
+	 *
+	 * //接口中具有属性
 	 */
 	String BEST_MATCHING_HANDLER_ATTRIBUTE = HandlerMapping.class.getName() + ".bestMatchingHandler";
 

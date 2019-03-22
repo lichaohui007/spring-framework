@@ -57,16 +57,17 @@ public final class RequestMappingInfo implements RequestCondition<RequestMapping
 	@Nullable
 	private final String name;
 
+	//请求路径的条件
 	private final PatternsRequestCondition patternsCondition;
-
+	//请求方法的条件
 	private final RequestMethodsRequestCondition methodsCondition;
-
+	//参数的条件
 	private final ParamsRequestCondition paramsCondition;
-
+	//请求头的条件
 	private final HeadersRequestCondition headersCondition;
-
+	//可消费的 Content-Type 条件
 	private final ConsumesRequestCondition consumesCondition;
-
+	//可生产的  Content-type 条件
 	private final ProducesRequestCondition producesCondition;
 
 	private final RequestConditionHolder customConditionHolder;
@@ -249,6 +250,7 @@ public final class RequestMappingInfo implements RequestCondition<RequestMapping
 	@Override
 	public int compareTo(RequestMappingInfo other, HttpServletRequest request) {
 		int result;
+		// @RequestMapping中的方法 path  param header  参数具有不同的权重
 		// Automatic vs explicit HTTP HEAD mapping
 		if (HttpMethod.HEAD.matches(request.getMethod())) {
 			result = this.methodsCondition.compareTo(other.getMethodsCondition(), request);

@@ -123,7 +123,9 @@ public final class PatternsRequestCondition extends AbstractRequestCondition<Pat
 
 	private static Set<String> prependLeadingSlash(Collection<String> patterns) {
 		Set<String> result = new LinkedHashSet<>(patterns.size());
+
 		for (String pattern : patterns) {
+			//如果pattern 不是以 /  开头  则在url前面加上 /
 			if (StringUtils.hasLength(pattern) && !pattern.startsWith("/")) {
 				pattern = "/" + pattern;
 			}
@@ -155,6 +157,8 @@ public final class PatternsRequestCondition extends AbstractRequestCondition<Pat
 	 * <li>If only one instance has patterns, use them.
 	 * <li>If neither instance has patterns, use an empty String (i.e. "").
 	 * </ul>
+	 *
+	 * 类对应的RequestMapping  和 方法的RequestMapping 进行合并
 	 */
 	@Override
 	public PatternsRequestCondition combine(PatternsRequestCondition other) {
@@ -162,6 +166,7 @@ public final class PatternsRequestCondition extends AbstractRequestCondition<Pat
 		if (!this.patterns.isEmpty() && !other.patterns.isEmpty()) {
 			for (String pattern1 : this.patterns) {
 				for (String pattern2 : other.patterns) {
+					//result中放入合并后的url
 					result.add(this.pathMatcher.combine(pattern1, pattern2));
 				}
 			}

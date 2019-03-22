@@ -31,6 +31,8 @@ import org.springframework.web.servlet.handler.HandlerMethodMappingNamingStrateg
  *
  * @author Rossen Stoyanchev
  * @since 4.1
+ *
+ * @Request 会被解析为  RequestMappingInfo
  */
 public class RequestMappingInfoHandlerMethodMappingNamingStrategy
 		implements HandlerMethodMappingNamingStrategy<RequestMappingInfo> {
@@ -39,11 +41,23 @@ public class RequestMappingInfoHandlerMethodMappingNamingStrategy
 	public static final String SEPARATOR = "#";
 
 
+	/**
+	 *
+	 * @param handlerMethod the handler method
+	 * @param mapping the mapping
+	 * @return
+	 *
+	 * 情况一，如果 Mapping 已经配置名字，则直接返回。例如，@RequestMapping(name = "login", value = "user/login") 注解的方法，它对应的 Mapping 的名字就是 "login" 。
+	 * 情况二，如果 Mapping 未配置名字，则使用使用类名大写 + "#" + 方法名。例如，@RequestMapping(value = "user/login") 注解的方法，
+	 * 假设它所在的类为 UserController ，对应的方法名为 login ，则它对应的 Mapping 的名字就是 USERCONTROLLER#login 。
+	 */
 	@Override
 	public String getName(HandlerMethod handlerMethod, RequestMappingInfo mapping) {
+		//mapping 名字非空  使用mapping的名字
 		if (mapping.getName() != null) {
 			return mapping.getName();
 		}
+		//使用类名大写 + "#" + 方法名
 		StringBuilder sb = new StringBuilder();
 		String simpleTypeName = handlerMethod.getBeanType().getSimpleName();
 		for (int i = 0 ; i < simpleTypeName.length(); i++) {

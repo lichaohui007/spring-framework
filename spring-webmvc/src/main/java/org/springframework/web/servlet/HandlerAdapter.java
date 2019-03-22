@@ -59,6 +59,7 @@ public interface HandlerAdapter {
 	 * }
 	 * @param handler handler object to check
 	 * @return whether or not this object can use the given handler
+	 * handler 实例是否支持被支持
 	 */
 	boolean supports(Object handler);
 
@@ -73,6 +74,7 @@ public interface HandlerAdapter {
 	 * @throws Exception in case of errors
 	 * @return a ModelAndView object with the name of the view and the required
 	 * model data, or {@code null} if the request has been handled directly
+	 * 执行处理器  返回  ModelAndView
 	 */
 	@Nullable
 	ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception;

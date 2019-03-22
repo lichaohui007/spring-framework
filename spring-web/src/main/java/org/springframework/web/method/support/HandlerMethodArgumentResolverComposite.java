@@ -134,6 +134,7 @@ public class HandlerMethodArgumentResolverComposite implements HandlerMethodArgu
 	private HandlerMethodArgumentResolver getArgumentResolver(MethodParameter parameter) {
 		HandlerMethodArgumentResolver result = this.argumentResolverCache.get(parameter);
 		if (result == null) {
+			//遍历所有的解析器 去解析这个参数
 			for (HandlerMethodArgumentResolver methodArgumentResolver : this.argumentResolvers) {
 				if (methodArgumentResolver.supportsParameter(parameter)) {
 					result = methodArgumentResolver;

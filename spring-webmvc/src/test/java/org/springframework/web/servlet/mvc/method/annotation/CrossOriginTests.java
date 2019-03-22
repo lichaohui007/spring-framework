@@ -455,6 +455,8 @@ public class CrossOriginTests {
 
 		@Override
 		protected RequestMappingInfo getMappingForMethod(Method method, Class<?> handlerType) {
+			//拿到方法上的注解
+			//拿到@RquestMapping的注解中参数  封装成RequestMappingInfo对象
 			RequestMapping annotation = AnnotatedElementUtils.findMergedAnnotation(method, RequestMapping.class);
 			if (annotation != null) {
 				return new RequestMappingInfo(

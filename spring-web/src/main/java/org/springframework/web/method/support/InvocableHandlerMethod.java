@@ -150,8 +150,11 @@ public class InvocableHandlerMethod extends HandlerMethod {
 		if (ObjectUtils.isEmpty(getMethodParameters())) {
 			return EMPTY_ARGS;
 		}
+		// 方法的参数信息数组
 		MethodParameter[] parameters = getMethodParameters();
+		// 解析后的参数结果数组
 		Object[] args = new Object[parameters.length];
+
 		for (int i = 0; i < parameters.length; i++) {
 			MethodParameter parameter = parameters[i];
 			parameter.initParameterNameDiscovery(this.parameterNameDiscoverer);
@@ -159,10 +162,12 @@ public class InvocableHandlerMethod extends HandlerMethod {
 			if (args[i] != null) {
 				continue;
 			}
+			//判断argumentResolvers 是否支持当期那的参数解析
 			if (!this.resolvers.supportsParameter(parameter)) {
 				throw new IllegalStateException(formatArgumentError(parameter, "No suitable resolver"));
 			}
 			try {
+				//解析成功进入 进入下一个参数的解析
 				args[i] = this.resolvers.resolveArgument(parameter, mavContainer, request, this.dataBinderFactory);
 			}
 			catch (Exception ex) {
@@ -186,6 +191,7 @@ public class InvocableHandlerMethod extends HandlerMethod {
 	protected Object doInvoke(Object... args) throws Exception {
 		ReflectionUtils.makeAccessible(getBridgedMethod());
 		try {
+			//调用@RequestMapping 的方法
 			return getBridgedMethod().invoke(getBean(), args);
 		}
 		catch (IllegalArgumentException ex) {

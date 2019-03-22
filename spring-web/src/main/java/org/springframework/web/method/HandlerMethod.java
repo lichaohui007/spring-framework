@@ -64,28 +64,37 @@ public class HandlerMethod {
 	/** Logger that is available to subclasses. */
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	//Bean 对象
 	private final Object bean;
 
 	@Nullable
 	private final BeanFactory beanFactory;
 
+	//bean类型
 	private final Class<?> beanType;
 
+	//方法
 	private final Method method;
 
+	//桥接方法
 	private final Method bridgedMethod;
 
+	//方法参数数组
 	private final MethodParameter[] parameters;
 
+	//响应的状态码
 	@Nullable
 	private HttpStatus responseStatus;
 
+	//响应的状态码的原因
 	@Nullable
 	private String responseStatusReason;
 
+	//解析自那个HandlerMethod 对象  仅构造方法中传入HandlerMethod 类型的参数适用
 	@Nullable
 	private HandlerMethod resolvedFromHandlerMethod;
 
+	//父接口的方法的参数注解数组
 	@Nullable
 	private volatile List<Annotation[][]> interfaceParameterAnnotations;
 
@@ -96,12 +105,16 @@ public class HandlerMethod {
 	public HandlerMethod(Object bean, Method method) {
 		Assert.notNull(bean, "Bean is required");
 		Assert.notNull(method, "Method is required");
+		//将beanName 赋值给bean属性  说明beanFactory+ bean 的方式  获得handler对象
 		this.bean = bean;
 		this.beanFactory = null;
+		//初始化beanType属性
 		this.beanType = ClassUtils.getUserClass(bean);
 		this.method = method;
 		this.bridgedMethod = BridgeMethodResolver.findBridgedMethod(method);
+		//初始化parameters 属性
 		this.parameters = initMethodParameters();
+		// 初始化responseStatus  responseStatusReason 属性
 		evaluateResponseStatus();
 	}
 
@@ -178,8 +191,10 @@ public class HandlerMethod {
 
 	private MethodParameter[] initMethodParameters() {
 		int count = this.bridgedMethod.getParameterCount();
+		// 创建MethodParameter 数组
 		MethodParameter[] result = new MethodParameter[count];
 		for (int i = 0; i < count; i++) {
+			//遍历 brigedMethod 的参数  逐个解析参数类型
 			HandlerMethodParameter parameter = new HandlerMethodParameter(i);
 			GenericTypeResolver.resolveParameterType(parameter, this.beanType);
 			result[i] = parameter;
@@ -399,6 +414,7 @@ public class HandlerMethod {
 	protected static Object findProvidedArgument(MethodParameter parameter, @Nullable Object... providedArgs) {
 		if (!ObjectUtils.isEmpty(providedArgs)) {
 			for (Object providedArg : providedArgs) {
+				//如果提供的参数是方法的形参类型
 				if (parameter.getParameterType().isInstance(providedArg)) {
 					return providedArg;
 				}

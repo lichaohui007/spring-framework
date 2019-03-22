@@ -41,6 +41,18 @@ import org.springframework.web.servlet.ModelAndView;
  * @author Rossen Stoyanchev
  * @author Brian Clozel
  * @since 3.0
+ *
+ * <mvc:interceptors>
+ *     <mvc:interceptor>
+ *         <mvc:mapping path="/interceptor/**" />
+ *         <mvc:exclude-mapping path="/interceptor/b/*" />
+ *         <bean class="com.elim.learn.spring.mvc.interceptor.MyInterceptor" />
+ *     </mvc:interceptor>
+ * </mvc:interceptors>
+ *
+ * 每个<mvc:interceptor></>  标签 会被org.springframewrk.web.servlet.config.InterceptorsBeanDefinitionParser 解析成   MappedInterceptor 对象  注册到Spring  ioc的容器中
+ *
+ * handler 和 interceptor  最终会组成handlerExecutiionChain 对象
  */
 public final class MappedInterceptor implements HandlerInterceptor {
 

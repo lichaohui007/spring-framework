@@ -96,6 +96,9 @@ public final class RequestMethodsRequestCondition extends AbstractRequestConditi
 	 * method is HTTP OPTIONS), a new condition with the matched request method,
 	 * or {@code null} if there is no match or the condition is empty and the
 	 * request method is OPTIONS.
+	 *
+	 * @RequestMapping(value = "user/login") 注解，并未写 RequestMethod 的条件，岂不是会报空？实际上不会。
+	 * 在这种情况下，会创建一个 RequestMethodsRequestCondition 对象，并且在匹配时，直接返回自身。
 	 */
 	@Override
 	@Nullable
@@ -103,7 +106,7 @@ public final class RequestMethodsRequestCondition extends AbstractRequestConditi
 		if (CorsUtils.isPreFlightRequest(request)) {
 			return matchPreFlight(request);
 		}
-
+		// RequestMappingInfo 对应@RequestMapping   this.methods 会记录自身的方法 put get 等
 		if (getMethods().isEmpty()) {
 			if (RequestMethod.OPTIONS.name().equals(request.getMethod()) &&
 					!DispatcherType.ERROR.equals(request.getDispatcherType())) {

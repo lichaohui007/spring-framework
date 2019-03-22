@@ -874,11 +874,13 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	protected void service(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
+		//获得请求方法
 		HttpMethod httpMethod = HttpMethod.resolve(request.getMethod());
 		if (httpMethod == HttpMethod.PATCH || httpMethod == null) {
 			processRequest(request, response);
 		}
 		else {
+			//调用父类处理其他请求
 			super.service(request, response);
 		}
 	}
@@ -889,6 +891,8 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	 * with a {@code NoBodyResponse} that just captures the content length.
 	 * @see #doService
 	 * @see #doHead
+	 *
+	 * doGet doPost   doDelete  doTrace  都是调用processRequest 方法  最终都转调到dispatcherServlet
 	 */
 	@Override
 	protected final void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -942,6 +946,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 
 		if (this.dispatchOptionsRequest || CorsUtils.isPreFlightRequest(request)) {
 			processRequest(request, response);
+			//在响应头加Allow
 			if (response.containsHeader("Allow")) {
 				// Proper OPTIONS response coming from a handler - we're done.
 				return;
@@ -987,6 +992,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	protected final void processRequest(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
+		//记录当前时间  用于计算web request 请求的处理时间
 		long startTime = System.currentTimeMillis();
 		Throwable failureCause = null;
 
@@ -1002,6 +1008,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		initContextHolders(request, localeContext, requestAttributes);
 
 		try {
+			//调到子类doDispatch
 			doService(request, response);
 		}
 		catch (ServletException | IOException ex) {
@@ -1018,7 +1025,10 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 			if (requestAttributes != null) {
 				requestAttributes.requestCompleted();
 			}
+			//打印请求日志  并且日志级别为Debug
+			//只在日志的请求级别是 DEBUG 时 才打印日志
 			logResult(request, response, failureCause, asyncManager);
+			// 发布ServletRequestHandlerEvent 事件
 			publishRequestHandledEvent(request, response, startTime, failureCause);
 		}
 	}
@@ -1137,6 +1147,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		if (this.publishEvents && this.webApplicationContext != null) {
 			// Whether or not we succeeded, publish an event.
 			long processingTime = System.currentTimeMillis() - startTime;
+			// 创建ServletRequestHandledEvent 事件  进行发布
 			this.webApplicationContext.publishEvent(
 					new ServletRequestHandledEvent(this,
 							request.getRequestURI(), request.getRemoteAddr(),
