@@ -88,10 +88,11 @@ public abstract class AbstractNamedValueArgumentResolver extends HandlerMethodAr
 	@Override
 	public Mono<Object> resolveArgument(
 			MethodParameter parameter, BindingContext bindingContext, ServerWebExchange exchange) {
-
+		//获得方法参数对应的namedValueInfo 对象
 		NamedValueInfo namedValueInfo = getNamedValueInfo(parameter);
+		//如果parameter 是内嵌类型  则获取内嵌参数  否则还是使用parameter 自身
 		MethodParameter nestedParameter = parameter.nestedIfOptional();
-
+		//如果那么是占位符  则解析对应的值
 		Object resolvedName = resolveStringValue(namedValueInfo.name);
 		if (resolvedName == null) {
 			return Mono.error(new IllegalArgumentException(
@@ -119,6 +120,7 @@ public abstract class AbstractNamedValueArgumentResolver extends HandlerMethodAr
 	private NamedValueInfo getNamedValueInfo(MethodParameter parameter) {
 		NamedValueInfo namedValueInfo = this.namedValueInfoCache.get(parameter);
 		if (namedValueInfo == null) {
+			//获取不到  则创建namedValueInfo 对象  将MethodParameter 对象映射成 namedValueInfo 对象
 			namedValueInfo = createNamedValueInfo(parameter);
 			namedValueInfo = updateNamedValueInfo(parameter, namedValueInfo);
 			this.namedValueInfoCache.put(parameter, namedValueInfo);
@@ -289,10 +291,11 @@ public abstract class AbstractNamedValueArgumentResolver extends HandlerMethodAr
 	 */
 	protected static class NamedValueInfo {
 
+		//名字
 		private final String name;
-
+		//是否必填
 		private final boolean required;
-
+		//默认值
 		@Nullable
 		private final String defaultValue;
 

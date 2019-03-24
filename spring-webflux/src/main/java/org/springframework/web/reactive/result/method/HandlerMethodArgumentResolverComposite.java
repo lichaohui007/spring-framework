@@ -42,9 +42,10 @@ import org.springframework.web.server.ServerWebExchange;
 class HandlerMethodArgumentResolverComposite implements HandlerMethodArgumentResolver {
 
 	protected final Log logger = LogFactory.getLog(getClass());
-
+	//复合的HandlerMethodArgumentResolver
 	private final List<HandlerMethodArgumentResolver> argumentResolvers = new LinkedList<>();
 
+	//MethodParameter 与 HandlerMethodArgumentResolver 的映射  作为缓存
 	private final Map<MethodParameter, HandlerMethodArgumentResolver> argumentResolverCache =
 			new ConcurrentHashMap<>(256);
 
@@ -120,6 +121,7 @@ class HandlerMethodArgumentResolverComposite implements HandlerMethodArgumentRes
 					"Unsupported parameter type [" + parameter.getParameterType().getName() + "]." +
 							" supportsParameter should be called first.");
 		}
+		//执行解析
 		return resolver.resolveArgument(parameter, bindingContext, exchange);
 	}
 
@@ -134,6 +136,7 @@ class HandlerMethodArgumentResolverComposite implements HandlerMethodArgumentRes
 			for (HandlerMethodArgumentResolver methodArgumentResolver : this.argumentResolvers) {
 				if (methodArgumentResolver.supportsParameter(parameter)) {
 					result = methodArgumentResolver;
+					//判断方法参数是否有对应的注解修饰 如 @RequestParam  @pathVarible
 					this.argumentResolverCache.put(parameter, result);
 					break;
 				}
